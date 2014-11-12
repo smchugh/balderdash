@@ -1,0 +1,17 @@
+# Virtual Environment
+venv
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# PyBuilder
+target/
+
+.DS_Store
+
+# IDE Files
+*idea
+
+# Database Files
+*.db
