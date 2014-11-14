@@ -1,0 +1,17 @@
+<!doctype html>
+<title>Balderdash</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+<div class=page>
+  <h1>Balderdash</h1>
+  <div class=metanav>
+  {% if not user_logged_in %}
+    <a href="{{ url_for('players.signin') }}">log in</a>
+  {% else %}
+    <a href="{{ url_for('players.signout') }}">log out</a>
+  {% endif %}
+  </div>
+  {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+  {% block body %}{% endblock %}
+</div>

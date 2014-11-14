@@ -7,6 +7,7 @@ from wtforms import StringField, PasswordField, IntegerField, BooleanField
 # Import input validators
 from wtforms.validators import InputRequired, EqualTo, Length, NumberRange, Optional
 
+# Import global app settings
 from settings import settings
 
 
@@ -93,7 +94,7 @@ class UpdateInputs(Base):
         ]
     )
 
-    active = BooleanField(
+    is_active = BooleanField(
         'Active',
         [Optional()]
     )

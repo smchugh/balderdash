@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block title %}Unprocessable Entity{% endblock %}
+{% block body %}
+  <h1>Unprocessable Entity</h1>
+  <h2>Errors</h2>
+  <p>{{ errors|tojson }}</p>
+  <h2>Inputs</h2>
+  <p>{{ inputs|tojson }}</p>
+{% endblock %}

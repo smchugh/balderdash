@@ -1,6 +1,6 @@
 # Import flask dependencies
-from flask import Blueprint, request, jsonify
-from flask.ext.login import login_user
+from flask import Blueprint
+from flask.ext.login import login_user, logout_user, user_logged_in
 
 # Import password / encryption helper tools
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -11,6 +11,9 @@ from application.inputs.Players import ListInputs, CreateInputs, UpdateInputs, S
 # Import models
 from application.models.Player import Player
 
+# Import view rendering
+from application.controllers import get_inputs, render_view
+
 # Define the blueprint
 players_module = Blueprint('players', __name__, url_prefix='/players')
 
@@ -18,29 +21,30 @@ players_module = Blueprint('players', __name__, url_prefix='/players')
 NOT_FOUND_ERROR = {'NotFound': ['Unable to find Player']}
 INVALID_USERNAME_PASSWORD_ERROR = {'InvalidInputs': ['Wrong username or password']}
 UNABLE_TO_SIGNIN_ERROR = {'SigninError': ['Unable to sign in an inactive player']}
+UNABLE_TO_SIGNOUT_ERROR = {'SignoutError': ['Unable to sign out player']}
 
 
 # Set the route and accepted methods
 @players_module.route('/', methods=['GET'])
 def index():
     # Get the input validator
-    inputs = ListInputs(request.values)
+    inputs = ListInputs(get_inputs())
 
     # Verify the list inputs
     if inputs.validate():
 
-        players = Player.query.order_by(Player.id).limit(inputs.limit.data).offset(inputs.offset.data).all()
+        players = Player.query.order_by(Player._id).limit(inputs.limit.data).offset(inputs.offset.data).all()
 
-        return jsonify({player.id: player.serialized for player in players}), 200
+        return render_view('players/index', 200, players={player.get_id(): player.serialized for player in players})
 
-    return jsonify({'errors': inputs.errors, 'inputs': inputs.obfuscated()}), 422
+    return render_view('422', 422, errors=inputs.errors, inputs=inputs.obfuscated())
 
 
 # Set the route and accepted methods
 @players_module.route('/', methods=['POST'])
 def create():
     # Get the input validator
-    inputs = CreateInputs(request.values)
+    inputs = CreateInputs(get_inputs())
 
     # Verify the player creation inputs
     if inputs.validate_on_submit():
@@ -48,86 +52,95 @@ def create():
         player = Player(inputs.username.data, generate_password_hash(inputs.password.data))
         try:
             player.save()
-            return jsonify(player.serialized), 201
+            return render_view('players/show', 201, player=player.serialized)
         except Exception as e:
-            return jsonify({'errors': {e.__class__.__name__: [e.message]}, 'inputs': inputs.obfuscated()}), 422
+            return render_view('422', 422, errors={e.__class__.__name__: [e.message]}, inputs=inputs.obfuscated())
 
-    return jsonify({'errors': inputs.errors, 'inputs': inputs.obfuscated()}), 422
+    return render_view('422', 422, errors=inputs.errors, inputs=inputs.obfuscated())
 
 
 # Set the route and accepted methods
 @players_module.route('/<int:player_id>', methods=['GET'])
-def get(player_id):
+def show(player_id):
     # Get the player
-    player = Player.query.filter_by(id=player_id).first()
+    player = Player.query.filter_by(_id=player_id).first()
 
     if player:
-        return jsonify(player.serialized), 200
+        return render_view('players/show', 200, player=player.serialized)
 
-    return jsonify({'errors': NOT_FOUND_ERROR, 'inputs': {'id': player_id}}), 422
+    return render_view('422', 422, errors=NOT_FOUND_ERROR, inputs={'id': player_id})
 
 
 # Set the route and accepted methods
 @players_module.route('/<int:player_id>', methods=['PUT'])
 def update(player_id):
     # Get the player
-    player = Player.query.filter_by(id=player_id).first()
+    player = Player.query.filter_by(_id=player_id).first()
 
     # Verify the player creation inputs
     if player:
 
         # Get the input validator
-        inputs = UpdateInputs(request.values)
+        inputs = UpdateInputs(get_inputs())
+        combined_inputs = dict(inputs.obfuscated().items() + {'id': player_id}.items())
 
         if inputs.validate_on_submit():
 
             try:
-                player.update(**request.values.to_dict())
-                return jsonify(player.serialized), 200
+                player.update(**get_inputs().to_dict())
+                return render_view('players/show', 200, player=player.serialized)
             except Exception as e:
-                return jsonify({'errors': {e.__class__.__name__: [e.message]}, 'inputs': inputs.obfuscated()}), 422
+                return render_view('422', 422, errors={e.__class__.__name__: [e.message]}, inputs=combined_inputs)
 
-        combined_inputs = dict(inputs.obfuscated().items() + {'id': player_id}.items())
-        return jsonify({'errors': inputs.errors, 'inputs': combined_inputs}), 422
+        return render_view('422', 422, errors=inputs.errors, inputs=combined_inputs)
 
-    return jsonify({'errors': NOT_FOUND_ERROR, 'inputs': {'id': player_id}}), 422
+    return render_view('422', 422, errors=NOT_FOUND_ERROR, inputs={'id': player_id})
 
 
 # Set the route and accepted methods
 @players_module.route('/<int:player_id>', methods=['DELETE'])
 def delete(player_id):
     # Get the player
-    player = Player.query.filter_by(id=player_id).first()
+    player = Player.query.filter_by(_id=player_id).first()
 
     # Verify the player creation inputs
     if player:
         try:
-            player.update(**{'active': False})
-            return jsonify(player.serialized), 200
+            player.update(**{'is_active': False})
+            return render_view('players/show', 200, player=player.serialized)
         except Exception as e:
-            return jsonify({'errors': {e.__class__.__name__: [e.message]}}), 422
+            return render_view('422', 422, errors={e.__class__.__name__: [e.message]}, inputs={'id': player_id})
 
-    return jsonify({'errors': NOT_FOUND_ERROR, 'inputs': {'id': player_id}}), 422
+    return render_view('422', 422, errors=NOT_FOUND_ERROR, inputs={'id': player_id})
 
 
 # Set the route and accepted methods
 @players_module.route('/signin/', methods=['POST'])
 def signin():
     # Get the input validator
-    inputs = SignInInputs(request.values)
+    inputs = SignInInputs(get_inputs())
 
     # Verify the sign in inputs
     if inputs.validate_on_submit():
 
-        player = Player.query.filter_by(username=inputs.username.data).first()
+        player = Player.query.filter_by(_username=inputs.username.data).first()
 
-        if player and check_password_hash(player.password, inputs.password.data):
+        if player and check_password_hash(player.get_password(), inputs.password.data):
 
             if login_user(player):
-                return jsonify(player.serialized.items()), 200
+                return render_view('players/show', 200, player=player.serialized)
             else:
-                return jsonify({'errors': UNABLE_TO_SIGNIN_ERROR, 'inputs': inputs.obfuscated()}), 422
+                return render_view('422', 422, errors=UNABLE_TO_SIGNIN_ERROR, inputs=inputs.obfuscated())
 
-        jsonify({'errors': INVALID_USERNAME_PASSWORD_ERROR, 'inputs': inputs.obfuscated()}), 422
+        return render_view('422', 422, errors=INVALID_USERNAME_PASSWORD_ERROR, inputs=inputs.obfuscated())
 
-    return jsonify({'errors': inputs.errors, 'inputs': inputs.obfuscated()}), 422
+    return render_view('422', 422, errors=inputs.errors, inputs=inputs.obfuscated())
+
+
+# Set the route and accepted methods
+@players_module.route('/signout/', methods=['POST'])
+def signout():
+    if not user_logged_in or logout_user():
+        return render_view('players/show', 200, player={'Success': 'Player signed out'})
+    else:
+        return render_view('422', 422, errors=UNABLE_TO_SIGNOUT_ERROR)

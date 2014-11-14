@@ -1,0 +1,4 @@
+{
+    "errors": {{ errors|tojson }},
+    "inputs": {{ inputs|tojson }}
+}

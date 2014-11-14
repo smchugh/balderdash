@@ -6,29 +6,50 @@ class Base(db.Model):
 
     __abstract__ = True
 
-    id = db.Column(db.Integer, primary_key=True)
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
-    date_modified = db.Column(
+    PROTECTED_ATTRIBUTES = ['id', 'date_created', 'date_modified']
+
+    _id = db.Column(db.Integer, primary_key=True)
+    _date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    _date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp()
     )
+
+    @classmethod
+    def get(cls, record_id):
+        return cls.query.filter_by(_id=record_id).first()
 
     def save(self):
         db.session.add(self)
         db.session.commit()
 
     def update(self, **updates):
+        protected_attrs = []
+        for attr in self.PROTECTED_ATTRIBUTES:
+            if attr in updates:
+                protected_attrs.append(attr)
+
+        if protected_attrs:
+            raise AttributeError(
+                'update to {} is not supported with changes to {}'.format(
+                    self.__class__.__name__, ', '.join(protected_attrs)
+                )
+            )
+
         for attr, value in updates.iteritems():
-            if hasattr(self, attr):
-                setattr(self, attr, value)
+            pattr = '_' + attr
+            if hasattr(self, pattr):
+                setattr(self, pattr, value)
+
         self.save()
 
+    # Define serialized form of the model
     @property
     def serialized(self):
         """Return object data in easily serializeable format"""
         return {
-            'id': self.id,
-            'date_created': self.dump_datetime(self.date_created),
-            'date_modified': self.dump_datetime(self.date_modified)
+            'id': self._id,
+            'date_created': self.dump_datetime(self._date_created),
+            'date_modified': self.dump_datetime(self._date_modified)
         }
 
     @staticmethod

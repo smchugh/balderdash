@@ -1,5 +1,5 @@
 # Import flask and template operators
-from flask import Flask, jsonify
+from flask import Flask
 
 # Import SQLAlchemy
 from flask.ext.sqlalchemy import SQLAlchemy
@@ -21,10 +21,13 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+# Import view rendering
+from application.controllers import render_view
+
 # Sample HTTP error handling
 @app.errorhandler(404)
 def not_found(error):
-    return jsonify({"errors": {error.__class__.__name__: [error.message]}}), 404
+    return render_view('404', 404, errors={error.__class__.__name__: [error.message]})
 
 # Import a module / component using its blueprint handler variable
 from application.controllers.Players import players_module
@@ -36,3 +39,11 @@ app.register_blueprint(players_module)
 # This will create the database file using SQLAlchemy
 # TODO replace sqlite with mysql
 db.create_all()
+
+# Configure the logger to print all SQL statements, if requested
+if app.config.get('PRINT_SQL', False):
+    import logging
+    logging.basicConfig()
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+
+logging.getLogger('werkzeug').setLevel(logging.INFO)
