@@ -3,23 +3,20 @@ from application.models.Base import Base
 from settings import settings
 
 
-class User(Base):
+class Player(Base):
 
-    __tablename__ = 'users'
+    __tablename__ = 'players'
 
-    # Identification Data: email, username & password
     username = db.Column(db.String(settings.USERNAME_MAX_LENGTH), nullable=False, unique=True)
     password = db.Column(db.String(settings.PASSWORD_MAX_LENGTH), nullable=False)
     active = db.Column(db.Boolean(), nullable=False, default=True)
 
-    # New instance instantiation procedure
     def __init__(self, username, password):
-
         self.username = username
         self.password = password
 
     def __repr__(self):
-        return '<User %r>' % self.id
+        return '<Player %r>' % self.id
 
     def is_authenticated(self):
         return True
@@ -38,9 +35,9 @@ class User(Base):
 
     @property
     def serialized(self):
-        base_properties = super(User, self).serialized
-        user_properties = {
+        base_properties = super(Player, self).serialized
+        player_properties = {
             'username': self.username,
             'is_active': self.is_active()
         }
-        return dict(base_properties.items() + user_properties.items())
+        return dict(base_properties.items() + player_properties.items())

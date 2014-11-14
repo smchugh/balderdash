@@ -16,10 +16,10 @@ class Base(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def update(self, **kwargs):
-        for prop, value in kwargs.iteritems():
-            if hasattr(self, prop):
-                setattr(self, prop, value)
+    def update(self, **updates):
+        for attr, value in updates.iteritems():
+            if hasattr(self, attr):
+                setattr(self, attr, value)
         self.save()
 
     @property

@@ -1,10 +1,10 @@
 # Import Form for input validation
 from flask.ext.wtf import Form
 
-# Import Form elements such as TextField
+# Import input types such as TextField
 from wtforms import StringField, PasswordField, IntegerField, BooleanField
 
-# Import Form validators
+# Import input validators
 from wtforms.validators import InputRequired, EqualTo, Length, NumberRange, Optional
 
 from settings import settings
@@ -25,7 +25,7 @@ class Base(Form):
         return inputs
 
 
-# Define the user list inputs
+# Define the player list inputs
 class ListInputs(Base):
     offset = IntegerField(
         'Offset',
@@ -38,7 +38,7 @@ class ListInputs(Base):
     )
 
 
-# Define the user creation inputs
+# Define the player creation inputs
 class CreateInputs(Base):
     username = StringField(
         'Username',
@@ -69,7 +69,7 @@ class CreateInputs(Base):
     )
 
 
-# Define the user creation inputs
+# Define the player update inputs
 class UpdateInputs(Base):
     username = StringField(
         'Username',

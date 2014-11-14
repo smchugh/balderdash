@@ -27,11 +27,12 @@ def not_found(error):
     return jsonify({"errors": {error.__class__.__name__: [error.message]}}), 404
 
 # Import a module / component using its blueprint handler variable
-from application.controllers.Users import users_module
+from application.controllers.Players import players_module
 
 # Register blueprint(s)
-app.register_blueprint(users_module)
+app.register_blueprint(players_module)
 
 # Build the database:
 # This will create the database file using SQLAlchemy
+# TODO replace sqlite with mysql
 db.create_all()
