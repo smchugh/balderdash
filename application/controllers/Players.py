@@ -18,7 +18,7 @@ from application.controllers import get_inputs, render_view
 players_module = Blueprint('players', __name__, url_prefix='/players')
 
 # Set some common error constants
-NOT_FOUND_ERROR = {'NotFound': ['Unable to find Player']}
+NOT_FOUND_ERROR = {'PlayerNotFound': ['Unable to find Player']}
 INVALID_USERNAME_PASSWORD_ERROR = {'InvalidInputs': ['Wrong username or password']}
 UNABLE_TO_SIGNIN_ERROR = {'SigninError': ['Unable to sign in an inactive player']}
 UNABLE_TO_SIGNOUT_ERROR = {'SignoutError': ['Unable to sign out player']}
@@ -33,7 +33,7 @@ def index():
     # Verify the list inputs
     if inputs.validate():
 
-        players = Player.query.order_by(Player._id).limit(inputs.limit.data).offset(inputs.offset.data).all()
+        players = Player.get_list(inputs.limit.data, inputs.offset.data)
 
         return render_view('players/index', 200, players={player.get_id(): player.serialized for player in players})
 
@@ -63,7 +63,7 @@ def create():
 @players_module.route('/<int:player_id>', methods=['GET'])
 def show(player_id):
     # Get the player
-    player = Player.query.filter_by(_id=player_id).first()
+    player = Player.get(player_id)
 
     if player:
         return render_view('players/show', 200, player=player.serialized)
@@ -75,7 +75,7 @@ def show(player_id):
 @players_module.route('/<int:player_id>', methods=['PUT'])
 def update(player_id):
     # Get the player
-    player = Player.query.filter_by(_id=player_id).first()
+    player = Player.get(player_id)
 
     # Verify the player creation inputs
     if player:
@@ -101,7 +101,7 @@ def update(player_id):
 @players_module.route('/<int:player_id>', methods=['DELETE'])
 def delete(player_id):
     # Get the player
-    player = Player.query.filter_by(_id=player_id).first()
+    player = Player.get(player_id)
 
     # Verify the player creation inputs
     if player:

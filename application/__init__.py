@@ -31,9 +31,13 @@ def not_found(error):
 
 # Import a module / component using its blueprint handler variable
 from application.controllers.Players import players_module
+from application.controllers.Games import games_module
+from application.controllers.Matches import matches_module
 
 # Register blueprint(s)
 app.register_blueprint(players_module)
+app.register_blueprint(games_module)
+app.register_blueprint(matches_module)
 
 # Build the database:
 # This will create the database file using SQLAlchemy

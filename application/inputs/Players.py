@@ -1,29 +1,14 @@
-# Import Form for input validation
-from flask.ext.wtf import Form
-
 # Import input types such as TextField
 from wtforms import StringField, PasswordField, IntegerField, BooleanField
 
 # Import input validators
 from wtforms.validators import InputRequired, EqualTo, Length, NumberRange, Optional
 
+# Import Base inputs class
+from application.inputs.Base import Base
+
 # Import global app settings
 from settings import settings
-
-
-class Base(Form):
-    def obfuscated(self):
-        inputs = {}
-        for name in dir(self):
-            if not name.startswith('__'):
-                attribute = getattr(self, name)
-                if hasattr(attribute, 'data'):
-                    inputs[name] = attribute.data
-
-        if inputs.get('password') is not None:
-            inputs['password'] = None
-
-        return inputs
 
 
 # Define the player list inputs

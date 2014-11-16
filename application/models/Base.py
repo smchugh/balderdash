@@ -8,7 +8,7 @@ class Base(db.Model):
 
     PROTECTED_ATTRIBUTES = ['id', 'date_created', 'date_modified']
 
-    _id = db.Column(db.Integer, primary_key=True)
+    _id = db.Column(db.BigInteger, primary_key=True)
     _date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     _date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp()
@@ -17,6 +17,17 @@ class Base(db.Model):
     @classmethod
     def get(cls, record_id):
         return cls.query.filter_by(_id=record_id).first()
+
+    @classmethod
+    def get_list(cls, limit, offset):
+        return cls.get_list_query(limit, offset).all()
+
+    @classmethod
+    def get_list_query(cls, limit, offset):
+        return cls.query.order_by(cls._id).limit(limit).offset(offset)
+
+    def get_id(self):
+        return self._id
 
     def save(self):
         db.session.add(self)
