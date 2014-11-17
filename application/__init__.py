@@ -4,9 +4,6 @@ from flask import Flask
 # Import SQLAlchemy
 from flask.ext.sqlalchemy import SQLAlchemy
 
-# Import Flask-Login
-from flask.ext.login import LoginManager
-
 # Define the WSGI application object
 app = Flask(__name__)
 
@@ -16,10 +13,6 @@ app.config.from_object('config')
 # Define the database object which is imported
 # by modules and controllers
 db = SQLAlchemy(app)
-
-# Define the login manager
-login_manager = LoginManager()
-login_manager.init_app(app)
 
 # Import view rendering
 from application.controllers import render_view

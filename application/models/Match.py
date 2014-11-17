@@ -34,9 +34,10 @@ class Match(Base):
     _date_started = db.Column(db.DateTime)
     _date_canceled = db.Column(db.DateTime)
     _date_completed = db.Column(db.DateTime)
+    _show = db.Column(db.Boolean, default=True)
 
-    def __init__(self, game_id, player):
-        self._game_id = game_id
+    def __init__(self, game, player):
+        self.game = game
         self.add_player(player)
 
     def __repr__(self):
@@ -84,7 +85,9 @@ class Match(Base):
 
     @classmethod
     def get_list_by_game_for_player(cls, game_id, player_id, limit, offset):
-        return cls.get_list_query(limit, offset).filter(
+        return cls.get_list_query(limit, offset).join(
+            match_players
+        ).filter(
             match_players.c.player_id == player_id,
             cls._game_id == game_id
         ).all()

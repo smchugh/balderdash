@@ -1,4 +1,1 @@
-{
-    "errors": {{ errors|tojson }},
-    "inputs": {{ inputs|tojson }}
-}
+{"errors": {{ errors|tojson }}{% if inputs %}, "inputs": {{ inputs|tojson }}{% endif %}}

@@ -1,6 +1,5 @@
 # Import flask dependencies
-from flask import Blueprint
-from flask.ext.login import login_user, logout_user, user_logged_in
+from flask import Blueprint, g
 
 # Import password / encryption helper tools
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -12,7 +11,7 @@ from application.inputs.Players import ListInputs, CreateInputs, UpdateInputs, S
 from application.models.Player import Player
 
 # Import view rendering
-from application.controllers import get_inputs, render_view
+from application.controllers import get_inputs, render_view, authenticate, get_current_user
 
 # Define the blueprint
 players_module = Blueprint('players', __name__, url_prefix='/players')
@@ -61,6 +60,7 @@ def create():
 
 # Set the route and accepted methods
 @players_module.route('/<int:player_id>', methods=['GET'])
+@authenticate
 def show(player_id):
     # Get the player
     player = Player.get(player_id)
@@ -73,6 +73,7 @@ def show(player_id):
 
 # Set the route and accepted methods
 @players_module.route('/<int:player_id>', methods=['PUT'])
+@authenticate
 def update(player_id):
     # Get the player
     player = Player.get(player_id)
@@ -99,6 +100,7 @@ def update(player_id):
 
 # Set the route and accepted methods
 @players_module.route('/<int:player_id>', methods=['DELETE'])
+@authenticate
 def delete(player_id):
     # Get the player
     player = Player.get(player_id)
@@ -127,8 +129,9 @@ def signin():
 
         if player and check_password_hash(player.get_password(), inputs.password.data):
 
-            if login_user(player):
-                return render_view('players/show', 200, player=player.serialized)
+            if player.login():
+                player_data = dict(player.serialized.items() + {'auth_token': player.get_auth_token()}.items())
+                return render_view('players/show', 200, player=player_data)
             else:
                 return render_view('422', 422, errors=UNABLE_TO_SIGNIN_ERROR, inputs=inputs.obfuscated())
 
@@ -139,8 +142,9 @@ def signin():
 
 # Set the route and accepted methods
 @players_module.route('/signout/', methods=['POST'])
+@authenticate
 def signout():
-    if not user_logged_in or logout_user():
+    if get_current_user() and get_current_user().logout():
         return render_view('players/show', 200, player={'Success': 'Player signed out'})
     else:
         return render_view('422', 422, errors=UNABLE_TO_SIGNOUT_ERROR)

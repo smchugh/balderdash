@@ -10,6 +10,14 @@ from application.inputs.Base import Base
 
 # Define the match list inputs
 class ListInputs(Base):
+    game_id = IntegerField(
+        'Game ID',
+        [
+            InputRequired(message='Must provide a game ID'),
+            NumberRange(min=1)
+        ]
+    )
+
     offset = IntegerField(
         'Offset',
         [Optional(), NumberRange(min=0)]
@@ -20,16 +28,6 @@ class ListInputs(Base):
         [Optional(), NumberRange(min=0)]
     )
 
-    game_id = IntegerField(
-        'Game ID',
-        [Optional(), NumberRange(min=1)]
-    )
-
-    player_id = IntegerField(
-        'Player ID',
-        [Optional(), NumberRange(min=1)]
-    )
-
 
 # Define the match creation inputs
 class CreateInputs(Base):
@@ -37,14 +35,6 @@ class CreateInputs(Base):
         'Game ID',
         [
             InputRequired(message='Must provide a game ID'),
-            NumberRange(min=1)
-        ]
-    )
-
-    player_id = IntegerField(
-        'Player ID',
-        [
-            InputRequired(message='Must provide a player ID'),
             NumberRange(min=1)
         ]
     )

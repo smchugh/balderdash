@@ -57,8 +57,3 @@ Flask-MySQL==1.2
 # License: GPL
 # Upstream url: http://sourceforge.net/projects/mysql-python
 MySQL-python==1.2.5
-
-# Provides user session management for Flask
-# License: BSD
-# Upstream url: https://github.com/maxcountryman/flask-login
-Flask-Login==0.2.11
