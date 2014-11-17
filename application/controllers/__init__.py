@@ -1,7 +1,7 @@
 from flask import render_template, request, g
 from functools import wraps
 
-from werkzeug.datastructures import MultiDict
+from werkzeug.datastructures import MultiDict, ImmutableMultiDict, CombinedMultiDict
 
 from application.models.Player import Player
 from application import app
@@ -10,11 +10,41 @@ from application import app
 UNAUTHORIZED_ERROR = {'UnauthorizedAccess': ['Attempted to access data without an authenticated player']}
 
 
+def is_json_input_valid():
+    return request.content_type == 'application/json' and request.method != 'GET'
+
+
 def get_inputs():
-    if request.content_type == 'application/json' and request.method != 'GET':
+    if is_json_input_valid():
         return MultiDict(dict(request.get_json(force=True).items() + request.values.items()))
     else:
         return request.values
+
+
+def unset_input(key):
+    if key in request.args:
+        request.args = rebuild_immutable_multidict_without_key(request.args, key)
+        request.values = build_combined_multidict(request.args, request.form)
+    if key in request.form:
+        request.form = rebuild_immutable_multidict_without_key(request.form, key)
+        request.values = build_combined_multidict(request.args, request.form)
+    if is_json_input_valid() and key in request.json:
+        del request.json[key]
+
+
+def build_combined_multidict(multidict1, multidict2):
+    args = []
+    for d in multidict1, multidict2:
+        if not isinstance(d, MultiDict):
+            d = MultiDict(d)
+        args.append(d)
+    return CombinedMultiDict(args)
+
+
+def rebuild_immutable_multidict_without_key(multidict, key):
+    tmp = MultiDict(multidict)
+    del tmp[key]
+    return ImmutableMultiDict(tmp)
 
 
 def render_view(template, code, **variables):
@@ -68,6 +98,7 @@ def before_request():
         if player:
             set_current_user(player)
             set_user_logged_in(True)
+            unset_input('auth_token')
 
 
 def authenticate(f):

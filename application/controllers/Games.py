@@ -42,7 +42,7 @@ def create():
     # Verify the game creation inputs
     if inputs.validate_on_submit():
 
-        game = Game(inputs.name.data, inputs.description.data)
+        game = Game(inputs.name.data, inputs.description.data, inputs.match_size.data)
         try:
             game.save()
             return render_view('games/show', 201, game=game.serialized)

@@ -2,7 +2,7 @@
 from wtforms import StringField, PasswordField, IntegerField, BooleanField
 
 # Import input validators
-from wtforms.validators import InputRequired, EqualTo, Length, NumberRange, Optional
+from wtforms.validators import InputRequired, EqualTo, Length, NumberRange, Optional, Email, URL
 
 # Import Base inputs class
 from application.inputs.Base import Base
@@ -54,6 +54,16 @@ class CreateInputs(Base):
         [InputRequired(message='Must confirm your password')]
     )
 
+    email = StringField(
+        'Email',
+        [InputRequired(message='Must provide and email address'), Email()]
+    )
+
+    avatar_url = StringField(
+        'Avatar URL',
+        [Optional(), URL()]
+    )
+
 
 # Define the player update inputs
 class UpdateInputs(Base):
@@ -77,6 +87,16 @@ class UpdateInputs(Base):
                 message='Password can not be more than {} characters'.format(Player.PASSWORD_MAX_LENGTH)
             )
         ]
+    )
+
+    email = StringField(
+        'Email',
+        [Optional(), Email()]
+    )
+
+    avatar_url = StringField(
+        'Avatar URL',
+        [Optional(), URL()]
     )
 
     is_active = BooleanField(

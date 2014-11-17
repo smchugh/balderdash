@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired, Length, NumberRange, Optional
 # Import Base inputs class
 from application.inputs.Base import Base
 
-# Import the Game class
+# Import the Game model
 from application.models.Game import Game
 
 

@@ -1,8 +1,8 @@
 # Import flask dependencies
-from flask import Blueprint, g
+from flask import Blueprint
 
 # Import password / encryption helper tools
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 
 # Import input validators
 from application.inputs.Players import ListInputs, CreateInputs, UpdateInputs, SignInInputs
@@ -48,10 +48,12 @@ def create():
     # Verify the player creation inputs
     if inputs.validate_on_submit():
 
-        player = Player(inputs.username.data, generate_password_hash(inputs.password.data))
+        avatar_url = inputs.avatar_url.data if inputs.avatar_url.data else None
+        player = Player(inputs.username.data, inputs.password.data, inputs.email.data, avatar_url)
         try:
             player.save()
-            return render_view('players/show', 201, player=player.serialized)
+            player_data = dict(player.serialized.items() + {'auth_token': player.get_auth_token()}.items())
+            return render_view('players/show', 201, player=player_data)
         except Exception as e:
             return render_view('422', 422, errors={e.__class__.__name__: [e.message]}, inputs=inputs.obfuscated())
 

@@ -16,12 +16,15 @@ class Match(Base):
 
     __tablename__ = 'matches'
 
-    PROTECTED_ATTRIBUTES = ['game_id', 'date_started', 'date_canceled', 'date_completed', 'players']
+    PROTECTED_ATTRIBUTES = ['game_id', 'date_started', 'date_canceled', 'date_completed', 'players', 'state', 'game']
 
-    STATE_WAITING = 1
-    STATE_STARTED = 2
-    STATE_CANCELED = 3
-    STATE_COMPLETED = 4
+    STATE_MAX_LENGTH = 32
+
+    STATE_WAITING = (0, 'waiting')
+    STATE_STARTED = (1, 'stared')
+    STATE_CANCELED = (2, 'canceled')
+    STATE_COMPLETED = (3, 'completed')
+    STATES = [STATE_WAITING, STATE_STARTED, STATE_CANCELED, STATE_COMPLETED]
 
     _game_id = db.Column(db.BigInteger, db.ForeignKey('games._id'))
     _players = db.relationship(
@@ -30,38 +33,91 @@ class Match(Base):
         backref=db.backref('matches', lazy='dynamic'),
         order_by=match_players.c.player_id
     )
-    _state = db.Column(db.SmallInteger, default=STATE_WAITING)
+    _state = db.Column(db.SmallInteger, default=STATE_WAITING[0])
     _date_started = db.Column(db.DateTime)
     _date_canceled = db.Column(db.DateTime)
     _date_completed = db.Column(db.DateTime)
-    _show = db.Column(db.Boolean, default=True)
+    _should_show = db.Column(db.Boolean, default=True)
 
     def __init__(self, game, player):
         self.game = game
         self.add_player(player)
 
     def __repr__(self):
-        return '<Match %r>' % self._id
+        return '<Match %r>' % self.get_id()
+
+    def get_game(self):
+        if self.game is None:
+            raise AttributeError(
+                'Match {} does not have a game. All matches must be assigned a game.'.format(self.get_id())
+            )
+        return self.game
+
+    def get_state(self):
+        return self._state
+
+    def get_state_string(self):
+        return self.STATES[self.get_state()][1]
+
+    def _set_state(self, state_id):
+        if state_id not in [state[0] for state in self.STATES]:
+            raise AttributeError(
+                'Cannot set the state to a value other than one of: {}'.format(
+                    ', '.join([state[1] for state in self.STATES])
+                )
+            )
+        self._state = state_id
+        return self
+
+    def get_date_started(self):
+        return self._date_started
+
+    def _set_date_started(self, date_started):
+        self._date_started = date_started
+        return self
+
+    def get_date_canceled(self):
+        return self._date_canceled
+
+    def _set_date_canceled(self, date_canceled):
+        self._date_canceled = date_canceled
+        return self
+
+    def get_date_completed(self):
+        return self._date_completed
+
+    def _set_date_completed(self, date_completed):
+        self._date_completed = date_completed
+        return self
+
+    def get_should_show(self):
+        return self._should_show
+
+    def set_should_show(self, should_show):
+        self._should_show = should_show
 
     def start(self):
-        self._date_started = db.func.current_timestamp()
-        self._state = self.STATE_STARTED
+        self._set_date_started(db.func.current_timestamp())
+        self._set_state(self.STATE_STARTED[0])
         return self
 
     def cancel(self):
-        self._date_canceled = db.func.current_timestamp()
-        self._state = self.STATE_CANCELED
+        self._set_date_canceled(db.func.current_timestamp())
+        self._set_state(self.STATE_CANCELED[0])
         return self
 
     def complete(self):
-        self._date_completed = db.func.current_timestamp()
-        self._state = self.STATE_COMPLETED
+        self._set_date_completed(db.func.current_timestamp())
+        self._set_state(self.STATE_COMPLETED[0])
         return self
+
+    def get_players(self):
+        return [] if self._players is None else self._players
 
     def add_player(self, player, should_start=True):
         self._players.append(player)
 
-        if should_start and len(self._players) == self.game.get_match_size():
+        if should_start and len(self.get_players()) == self.get_game().get_match_size():
             self.start()
 
         return self
@@ -71,11 +127,11 @@ class Match(Base):
     def serialized(self):
         base_properties = super(Match, self).serialized
         match_properties = {
-            'date_started': self.dump_datetime(self._date_started),
-            'date_canceled': self.dump_datetime(self._date_canceled),
-            'date_completed': self.dump_datetime(self._date_completed),
-            'game': self.game.serialized,
-            'players': {player.get_id(): player.serialized for player in self._players}
+            'date_started': self.dump_datetime(self.get_date_started()),
+            'date_canceled': self.dump_datetime(self.get_date_canceled()),
+            'date_completed': self.dump_datetime(self.get_date_completed()),
+            'game': self.get_game().serialized,
+            'players': {player.get_id(): player.serialized for player in self.get_players()}
         }
 
         # TODO if date_started != None and date_canceled == None and date_completed == None, show the
