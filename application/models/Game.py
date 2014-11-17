@@ -1,9 +1,6 @@
 from application import db
 from application.models.Base import Base
 
-# Import global app settings
-from settings import settings
-
 
 class Game(Base):
 
@@ -11,8 +8,11 @@ class Game(Base):
 
     PROTECTED_ATTRIBUTES = ['match_size', 'matches']
 
-    _name = db.Column(db.String(settings.GAME_NAME_MAX_LENGTH), nullable=False, unique=True)
-    _description = db.Column(db.String(settings.GAME_DESCRIPTION_MAX_LENGTH), nullable=False)
+    NAME_MAX_LENGTH = 128
+    DESCRIPTION_MAX_LENGTH = 1024
+
+    _name = db.Column(db.String(NAME_MAX_LENGTH), nullable=False, unique=True)
+    _description = db.Column(db.String(DESCRIPTION_MAX_LENGTH), nullable=False)
     _matches = db.relationship('Match', backref='game', lazy='dynamic')
     _match_size = db.Column(db.Integer, nullable=False, default=2)
     _is_active = db.Column(db.Boolean(), nullable=False, default=True)

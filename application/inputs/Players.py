@@ -7,8 +7,8 @@ from wtforms.validators import InputRequired, EqualTo, Length, NumberRange, Opti
 # Import Base inputs class
 from application.inputs.Base import Base
 
-# Import global app settings
-from settings import settings
+# Import the Player model
+from application.models.Player import Player
 
 
 # Define the player list inputs
@@ -31,8 +31,8 @@ class CreateInputs(Base):
         [
             InputRequired(message='Must provide a username'),
             Length(
-                max=settings.USERNAME_MAX_LENGTH,
-                message='Username can not be more than {} characters'.format(settings.USERNAME_MAX_LENGTH)
+                max=Player.USERNAME_MAX_LENGTH,
+                message='Username can not be more than {} characters'.format(Player.USERNAME_MAX_LENGTH)
             )
         ]
     )
@@ -42,8 +42,8 @@ class CreateInputs(Base):
         [
             InputRequired(message='Must provide a password'),
             Length(
-                max=settings.PASSWORD_MAX_LENGTH,
-                message='Password can not be more than {} characters'.format(settings.PASSWORD_MAX_LENGTH)
+                max=Player.PASSWORD_MAX_LENGTH,
+                message='Password can not be more than {} characters'.format(Player.PASSWORD_MAX_LENGTH)
             ),
             EqualTo('confirm', message='Passwords must match'),
         ]
@@ -62,8 +62,8 @@ class UpdateInputs(Base):
         [
             Optional(),
             Length(
-                max=settings.USERNAME_MAX_LENGTH,
-                message='Username can not be more than {} characters'.format(settings.USERNAME_MAX_LENGTH)
+                max=Player.USERNAME_MAX_LENGTH,
+                message='Username can not be more than {} characters'.format(Player.USERNAME_MAX_LENGTH)
             )
         ]
     )
@@ -73,8 +73,8 @@ class UpdateInputs(Base):
         [
             Optional(),
             Length(
-                max=settings.PASSWORD_MAX_LENGTH,
-                message='Password can not be more than {} characters'.format(settings.PASSWORD_MAX_LENGTH)
+                max=Player.PASSWORD_MAX_LENGTH,
+                message='Password can not be more than {} characters'.format(Player.PASSWORD_MAX_LENGTH)
             )
         ]
     )

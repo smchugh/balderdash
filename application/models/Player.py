@@ -1,11 +1,7 @@
 import uuid
-from flask import g
 
 from application import db, app
 from application.models.Base import Base
-
-# Import global app settings
-from settings import settings
 
 
 class Player(Base):
@@ -14,12 +10,18 @@ class Player(Base):
 
     PROTECTED_ATTRIBUTES = ['auth_token']
 
-    _username = db.Column(db.String(settings.USERNAME_MAX_LENGTH), nullable=False, unique=True)
-    _email = db.Column(db.String(settings.EMAIL_MAX_LENGTH), nullable=False, unique=True)
-    _password = db.Column(db.String(settings.PASSWORD_MAX_LENGTH), nullable=False)
+    USERNAME_MAX_LENGTH = 128
+    EMAIL_MAX_LENGTH = 128
+    PASSWORD_MAX_LENGTH = 192
+    AUTH_TOKEN_LENGTH = 128
+    AVATAR_URL_MAX_LENGTH = 256
+
+    _username = db.Column(db.String(USERNAME_MAX_LENGTH), nullable=False, unique=True)
+    _email = db.Column(db.String(EMAIL_MAX_LENGTH), nullable=False, unique=True)
+    _password = db.Column(db.String(PASSWORD_MAX_LENGTH), nullable=False)
     _is_active = db.Column(db.Boolean(), nullable=False, default=True)
-    _auth_token = db.Column(db.String(settings.AUTH_TOKEN_LENGTH))
-    _avatar_url = db.Column(db.String(settings.AVATAR_URL_MAX_LENGTH))
+    _auth_token = db.Column(db.String(AUTH_TOKEN_LENGTH))
+    _avatar_url = db.Column(db.String(AVATAR_URL_MAX_LENGTH))
 
     def __init__(self, username, password):
         self._username = username
