@@ -47,6 +47,27 @@ def rebuild_immutable_multidict_without_key(multidict, key):
     return ImmutableMultiDict(tmp)
 
 
+def get_mixed_dict_from_multidict(multidict, inputs=None):
+        """
+        Returns a dictionary where the values are either single
+        values, or a list of values when a key/value appears more than
+        once in this dictionary.  This is similar to the kind of
+        dictionary often used to represent the variables in a web
+        request.
+        """
+        result = {}
+        for item in multidict.lists():
+            key = item[0]
+            if len(item[1]) == 1 and inputs and not isinstance(inputs.data.get(key), list):
+                value = item[1][0]
+            else:
+                value = item[1]
+
+            result[key] = value
+
+        return result
+
+
 def render_view(template, code, **variables):
     if request.content_type == 'application/json':
         return render_template_type(template, 'json', code, 'application/json', variables)

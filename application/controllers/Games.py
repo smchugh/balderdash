@@ -8,7 +8,7 @@ from application.inputs.Games import ListInputs, CreateInputs, UpdateInputs
 from application.models.Game import Game
 
 # Import view rendering
-from application.controllers import get_inputs, render_view
+from application.controllers import get_inputs, render_view, get_mixed_dict_from_multidict
 
 # Define the blueprint
 games_module = Blueprint('games', __name__, url_prefix='/games')
@@ -80,7 +80,7 @@ def update(game_id):
         if inputs.validate_on_submit():
 
             try:
-                game.update(**get_inputs().to_dict())
+                game.update(**get_mixed_dict_from_multidict(get_inputs(), inputs))
                 return render_view('games/show', 200, game=game.serialized)
             except Exception as e:
                 return render_view('422', 422, errors={e.__class__.__name__: [e.message]}, inputs=combined_inputs)

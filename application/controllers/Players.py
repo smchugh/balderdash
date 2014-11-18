@@ -11,7 +11,8 @@ from application.inputs.Players import ListInputs, CreateInputs, UpdateInputs, S
 from application.models.Player import Player
 
 # Import view rendering
-from application.controllers import get_inputs, render_view, authenticate, get_current_user
+from application.controllers import get_inputs, render_view, authenticate, \
+    get_current_user, get_mixed_dict_from_multidict
 
 # Define the blueprint
 players_module = Blueprint('players', __name__, url_prefix='/players')
@@ -90,7 +91,7 @@ def update(player_id):
         if inputs.validate_on_submit():
 
             try:
-                player.update(**get_inputs().to_dict())
+                player.update(**get_mixed_dict_from_multidict(get_inputs(), inputs))
                 return render_view('players/show', 200, player=player.serialized)
             except Exception as e:
                 return render_view('422', 422, errors={e.__class__.__name__: [e.message]}, inputs=combined_inputs)
