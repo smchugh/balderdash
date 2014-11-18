@@ -26,11 +26,17 @@ def not_found(error):
 from application.controllers.Players import players_module
 from application.controllers.Games import games_module
 from application.controllers.Matches import matches_module
+from application.controllers.Words import words_module
+from application.controllers.DefinitionTemplates import definition_templates_module
+from application.controllers.DefinitionFillers import definition_fillers_module
 
-# Register blueprint(s)
+# Register blueprints
 app.register_blueprint(players_module)
 app.register_blueprint(games_module)
 app.register_blueprint(matches_module)
+app.register_blueprint(words_module)
+app.register_blueprint(definition_templates_module)
+app.register_blueprint(definition_fillers_module)
 
 # Build the database:
 # This will create the database file using SQLAlchemy
