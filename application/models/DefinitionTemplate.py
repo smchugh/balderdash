@@ -11,14 +11,14 @@ class DefinitionTemplate(Base):
 
     DEFINITION_MAX_LENGTH = 512
 
-    _word_id = db.Column(db.BigInteger, db.ForeignKey('words._id'))
+    _word_id = db.Column(db.BigInteger, db.ForeignKey('words._id'), nullable=False)
     _definition = db.Column(db.String(DEFINITION_MAX_LENGTH), nullable=False)
     _filler_lexical_classes = db.Column(db.PickleType(), nullable=False)
-    _definition_fillers = db.relationship('DefinitionFiller', backref='definition_template', lazy='dynamic')
+    _definition_fillers = db.relationship('DefinitionFiller', backref='_definition_template', lazy='dynamic')
     _is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     def __init__(self, word, definition, filler_lexical_classes):
-        self.word = word
+        self._set_word(word)
         self._set_definition(definition)
         self._set_filler_lexical_classes(filler_lexical_classes)
 
@@ -26,7 +26,11 @@ class DefinitionTemplate(Base):
         return '<DefinitionTemplate %r>' % self.get_id()
 
     def get_word(self):
-        return self.word
+        return self._word
+
+    def _set_word(self, word):
+        self._word = word
+        return self
 
     def get_definition(self):
         return self._definition

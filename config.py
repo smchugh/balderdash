@@ -8,7 +8,6 @@ PRINT_SQL = os.environ.get('PRINT_SQL', False) in [True, 'True', '1', 'y', 'yes'
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))  
 
 # Define the database - we are working with
-# SQLite for this example
 SQLALCHEMY_DATABASE_URI = 'mysql://root@localhost/balderdash'
 DATABASE_CONNECT_OPTIONS = {}
 

@@ -13,7 +13,7 @@ class Game(Base):
 
     _name = db.Column(db.String(NAME_MAX_LENGTH), nullable=False, unique=True)
     _description = db.Column(db.String(DESCRIPTION_MAX_LENGTH), nullable=False)
-    _matches = db.relationship('Match', backref='game', lazy='dynamic')
+    _matches = db.relationship('Match', backref='_game', lazy='dynamic')
     _match_size = db.Column(db.Integer, nullable=False, default=2)
     _is_active = db.Column(db.Boolean, nullable=False, default=True)
 

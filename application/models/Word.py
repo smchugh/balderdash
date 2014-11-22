@@ -15,7 +15,7 @@ class Word(Base):
 
     _lexeme_form = db.Column(db.String(LEXEME_FORM_MAX_LENGTH), nullable=False, unique=True)
     _lexical_class = db.Column(db.String(LEXICAL_CLASS_MAX_LENGTH), nullable=False)
-    _definition_templates = db.relationship('DefinitionTemplate', backref='word', lazy='dynamic')
+    _definition_templates = db.relationship('DefinitionTemplate', backref='_word', lazy='dynamic')
     _is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     def __init__(self, lexeme_form, lexical_class):

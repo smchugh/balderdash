@@ -26,32 +26,36 @@ class Match(Base):
     STATE_COMPLETED = (3, 'completed')
     STATES = [STATE_WAITING, STATE_STARTED, STATE_CANCELED, STATE_COMPLETED]
 
-    _game_id = db.Column(db.BigInteger, db.ForeignKey('games._id'))
+    _game_id = db.Column(db.BigInteger, db.ForeignKey('games._id'), nullable=False)
     _players = db.relationship(
         'Player',
         secondary=match_players,
-        backref=db.backref('matches', lazy='dynamic'),
+        backref=db.backref('_matches', lazy='dynamic'),
         order_by=match_players.c.player_id
     )
-    _state = db.Column(db.SmallInteger, default=STATE_WAITING[0])
+    _state = db.Column(db.SmallInteger, default=STATE_WAITING[0], nullable=False)
     _date_started = db.Column(db.DateTime)
     _date_canceled = db.Column(db.DateTime)
     _date_completed = db.Column(db.DateTime)
     _should_show = db.Column(db.Boolean, default=True)
 
     def __init__(self, game, player):
-        self.game = game
+        self._set_game(game)
         self.add_player(player)
 
     def __repr__(self):
         return '<Match %r>' % self.get_id()
 
     def get_game(self):
-        if self.game is None:
+        if self._game is None:
             raise AttributeError(
                 'Match {} does not have a game. All matches must be assigned a game.'.format(self.get_id())
             )
-        return self.game
+        return self._game
+
+    def _set_game(self, game):
+        self._game = game
+        return self
 
     def get_state(self):
         return self._state

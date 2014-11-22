@@ -9,15 +9,15 @@ class DefinitionFiller(Base):
 
     __tablename__ = 'definition_filler'
 
-    PROTECTED_ATTRIBUTES = ['definition_template_id', 'filler', 'is_dictionary']
+    PROTECTED_ATTRIBUTES = ['definition_template_id', 'definition_template', 'filler', 'is_dictionary']
 
-    _definition_template_id = db.Column(db.BigInteger, db.ForeignKey('definition_templates._id'))
+    _definition_template_id = db.Column(db.BigInteger, db.ForeignKey('definition_templates._id'), nullable=False)
     _filler = db.Column(db.PickleType(), nullable=False)
     _is_dictionary = db.Column(db.Boolean, nullable=False, default=False)
     _is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     def __init__(self, definition_template, filler, is_dictionary):
-        self.definition_template = definition_template
+        self._set_definition_template(definition_template)
         self._set_filler(filler)
         self._set_is_dictionary(is_dictionary)
 
@@ -25,7 +25,11 @@ class DefinitionFiller(Base):
         return '<DefinitionTemplate %r>' % self.get_id()
 
     def get_definition_template(self):
-        return self.definition_template
+        return self._definition_template
+
+    def _set_definition_template(self, definition_template):
+        self._definition_template = definition_template
+        return self
 
     def get_filler(self):
         return self._filler
