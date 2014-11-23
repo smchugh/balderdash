@@ -3,6 +3,8 @@ Balderdash
 Service to support Balderdash app
 
 ##Installation
+Ensure mysql is installed and then do the following:
+
 ```
 $ sudo pip install virtualenv
 $ cd ~/workspace

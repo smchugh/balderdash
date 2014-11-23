@@ -1,3 +1,5 @@
+import logging
+
 # Import flask and template operators
 from flask import Flask
 
@@ -10,14 +12,13 @@ app = Flask(__name__)
 # Configurations
 app.config.from_object('config')
 
-# Define the database object which is imported
-# by modules and controllers
+# Define the database object which is imported by model and controllers
 db = SQLAlchemy(app)
 
 # Import view rendering
 from application.controllers import render_view
 
-# Sample HTTP error handling
+# Specify 404 error handling
 @app.errorhandler(404)
 def not_found(error):
     return render_view('404', 404, errors={error.__class__.__name__: [error.message]})
@@ -39,14 +40,12 @@ app.register_blueprint(definition_templates_module)
 app.register_blueprint(definition_fillers_module)
 
 # Build the database:
-# This will create the database file using SQLAlchemy
-# TODO replace sqlite with mysql
+# This will create the database using SQLAlchemy
 db.create_all()
+
+logging.basicConfig()
+logging.getLogger('werkzeug').setLevel(logging.INFO)
 
 # Configure the logger to print all SQL statements, if requested
 if app.config.get('PRINT_SQL', False):
-    import logging
-    logging.basicConfig()
     logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-
-logging.getLogger('werkzeug').setLevel(logging.INFO)
