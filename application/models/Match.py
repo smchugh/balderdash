@@ -18,8 +18,6 @@ class Match(Base):
 
     PROTECTED_ATTRIBUTES = ['game_id', 'date_started', 'date_canceled', 'date_completed', 'players', 'state', 'game']
 
-    STATE_MAX_LENGTH = 32
-
     STATE_WAITING = (0, 'waiting')
     STATE_STARTED = (1, 'stared')
     STATE_CANCELED = (2, 'canceled')
@@ -37,7 +35,8 @@ class Match(Base):
     _date_started = db.Column(db.DateTime)
     _date_canceled = db.Column(db.DateTime)
     _date_completed = db.Column(db.DateTime)
-    _should_show = db.Column(db.Boolean, default=True)
+    _is_archived = db.Column(db.Boolean, default=False)
+    _is_hidden = db.Column(db.Boolean, default=False)
 
     def __init__(self, game, player):
         self._set_game(game)
@@ -94,11 +93,17 @@ class Match(Base):
         self._date_completed = date_completed
         return self
 
-    def get_should_show(self):
-        return self._should_show
+    def get_is_archived(self):
+        return self._is_archived
 
-    def set_should_show(self, should_show):
-        self._should_show = should_show
+    def set_is_archived(self, is_archived):
+        self._is_archived = is_archived
+
+    def get_is_hidden(self):
+        return self._is_hidden
+
+    def set_is_hidden(self, is_hidden):
+        self._is_hidden = is_hidden
 
     def start(self):
         self._set_date_started(db.func.current_timestamp())
