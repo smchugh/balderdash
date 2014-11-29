@@ -6,14 +6,17 @@ from application.inputs.Matches import ListInputs, CreateInputs
 
 # Import models
 from application.models.Match import Match
-from application.models.Player import Player
-from application.models.Game import Game
 
-# Define the blueprint
-matches_module = Blueprint('matches', __name__, url_prefix='/matches')
+# Import services
+from application.services.GamesService import GamesService
+from application.services.PlayersService import PlayersService
+from application.services.MatchesService import MatchesService
 
 # Import view rendering
 from application.controllers import get_inputs, render_view, authenticate, get_current_user
+
+# Define the blueprint
+matches_module = Blueprint('matches', __name__, url_prefix='/matches')
 
 # Set some common error constants
 NOT_FOUND_ERROR = {'MatchNotFound': ['Unable to find Match']}
@@ -30,10 +33,9 @@ def index():
 
     # Verify the list inputs
     if inputs.validate():
-        matches = Match.get_list_by_game_for_player(
+        matches = MatchesService.get_instance().get_list_by_game_for_player(
             inputs.game_id.data, get_current_user().get_id(), inputs.limit.data, inputs.offset.data
         )
-        print get_current_user().get_id()
 
         return render_view('matches/index', 200, matches={match.get_id(): match.serialized for match in matches})
 
@@ -50,17 +52,19 @@ def create():
     # Verify the match creation inputs
     if inputs.validate_on_submit():
         # Ensure we have a valid game
-        game = Game.get(inputs.game_id.data)
+        game = GamesService.get_instance().get(inputs.game_id.data)
         if game:
             # If an opponent is specified, match with that opponent
             if inputs.opponent_id.data:
                 # Ensure that the opponent is a valid user
-                opponent = Player.get(inputs.opponent_id.data)
+                opponent = PlayersService.get_instance().get(inputs.opponent_id.data)
                 if not opponent:
                     return render_view('422', 422, errors=OPPONENT_NOT_FOUND_ERROR, inputs=inputs.serialized())
 
                 # First attempt to find a match already requested by the desired opponent
-                match = Match.get_opponent_match(game.get_id(), get_current_user(), opponent.get_id())
+                match = MatchesService.get_instance().get_opponent_match(
+                    game.get_id(), get_current_user(), opponent.get_id()
+                )
 
                 # If the match is found, add the player to it and start the match if it's full
                 if match:
@@ -75,7 +79,7 @@ def create():
             # Otherwise, match with a random opponent
             else:
                 # First, attempt to find a match that is looking for an opponent
-                match = Match.get_random_match(game.get_id(), get_current_user())
+                match = MatchesService.get_instance().get_random_match(game.get_id(), get_current_user())
 
                 # If the match is found, add the player to it and start the match if it's full
                 if match:
@@ -101,7 +105,7 @@ def create():
 @authenticate
 def show(match_id):
     # Get the match
-    match = Match.get(match_id)
+    match = MatchesService.get_instance().get(match_id)
 
     if match:
         return render_view('matches/show', 200, match=match.serialized)

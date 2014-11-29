@@ -10,6 +10,9 @@ from application.inputs.Players import ListInputs, CreateInputs, UpdateInputs, S
 # Import models
 from application.models.Player import Player
 
+# Import services
+from application.services.PlayersService import PlayersService
+
 # Import view rendering
 from application.controllers import get_inputs, render_view, authenticate, \
     get_current_user, get_mixed_dict_from_multidict
@@ -33,7 +36,7 @@ def index():
     # Verify the list inputs
     if inputs.validate():
 
-        players = Player.get_list(inputs.limit.data, inputs.offset.data)
+        players = PlayersService.get_instance().get_list(inputs.limit.data, inputs.offset.data)
 
         return render_view('players/index', 200, players={player.get_id(): player.serialized for player in players})
 
@@ -66,7 +69,7 @@ def create():
 @authenticate
 def show(player_id):
     # Get the player
-    player = Player.get(player_id)
+    player = PlayersService.get_instance().get(player_id)
 
     if player:
         return render_view('players/show', 200, player=player.serialized)
@@ -79,7 +82,7 @@ def show(player_id):
 @authenticate
 def update(player_id):
     # Get the player
-    player = Player.get(player_id)
+    player = PlayersService.get_instance().get(player_id)
 
     # Verify the player creation inputs
     if player:
@@ -106,7 +109,7 @@ def update(player_id):
 @authenticate
 def delete(player_id):
     # Get the player
-    player = Player.get(player_id)
+    player = PlayersService.get_instance().get(player_id)
 
     # Verify the player creation inputs
     if player:
@@ -128,7 +131,7 @@ def signin():
     # Verify the sign in inputs
     if inputs.validate_on_submit():
 
-        player = Player.query.filter_by(_username=inputs.username.data).first()
+        player = PlayersService.get_instance().get_from_username(inputs.username.data)
 
         if player and check_password_hash(player.get_password(), inputs.password.data):
 

@@ -5,8 +5,11 @@ from flask import Blueprint
 from application.inputs.DefinitionFillers import ListInputs, CreateInputs, UpdateInputs
 
 # Import models
-from application.models.DefinitionTemplate import DefinitionTemplate
 from application.models.DefinitionFiller import DefinitionFiller
+
+# Import services
+from application.services.DefinitionFillersService import DefinitionFillersService
+from application.services.DefinitionTemplatesService import DefinitionTemplatesService
 
 # Import view rendering
 from application.controllers import get_inputs, render_view, get_mixed_dict_from_multidict
@@ -31,15 +34,15 @@ def index():
     if inputs.validate():
 
         if inputs.word_id.data:
-            definition_fillers = DefinitionFiller.get_list_by_word(
+            definition_fillers = DefinitionFillersService.get_instance().get_list_by_word(
                 inputs.word_id.data, inputs.limit.data, inputs.offset.data
             )
         elif inputs.definition_template_id.data:
-            definition_fillers = DefinitionFiller.get_list_by_definition_template(
+            definition_fillers = DefinitionFillersService.get_instance().get_list_by_definition_template(
                 inputs.definition_template_id.data, inputs.limit.data, inputs.offset.data
             )
         else:
-            definition_fillers = DefinitionFiller.get_list(inputs.limit.data, inputs.offset.data)
+            definition_fillers = DefinitionFillersService.get_instance().get_list(inputs.limit.data, inputs.offset.data)
 
         return render_view(
             'definition_fillers/index',
@@ -66,9 +69,7 @@ def create():
     # Verify the definition_filler creation inputs
     if inputs.validate_on_submit():
 
-        print inputs.filler.data
-
-        definition_template = DefinitionTemplate.get(inputs.definition_template_id.data)
+        definition_template = DefinitionTemplatesService.get_instance().get(inputs.definition_template_id.data)
         if definition_template:
             definition_filler = DefinitionFiller(definition_template, inputs.filler.data, inputs.is_dictionary.data)
             try:
@@ -86,7 +87,7 @@ def create():
 @definition_fillers_module.route('/<int:definition_filler_id>', methods=['GET'])
 def show(definition_filler_id):
     # Get the definition_filler
-    definition_filler = DefinitionFiller.get(definition_filler_id)
+    definition_filler = DefinitionFillersService.get_instance().get(definition_filler_id)
 
     if definition_filler:
         return render_view('definition_fillers/show', 200, definition_filler=definition_filler.serialized)
@@ -98,7 +99,7 @@ def show(definition_filler_id):
 @definition_fillers_module.route('/<int:definition_filler_id>', methods=['PUT'])
 def update(definition_filler_id):
     # Get the definition_filler
-    definition_filler = DefinitionFiller.get(definition_filler_id)
+    definition_filler = DefinitionFillersService.get_instance().get(definition_filler_id)
 
     # Verify the definition_filler creation inputs
     if definition_filler:
@@ -127,8 +128,9 @@ def update(definition_filler_id):
             else:
                 definition_filler.update(**{'is_active': False})
 
-                definition_template = DefinitionTemplate.get(inputs.definition_template_id.data) \
-                    if inputs.definition_template_id.data else definition_filler.get_definition_template()
+                definition_template = DefinitionTemplatesService.get_instance().get(
+                    inputs.definition_template_id.data
+                ) if inputs.definition_template_id.data else definition_filler.get_definition_template()
                 filler = inputs.filler.data if inputs.filler.data else definition_filler.get_filler()
                 is_dictionary = inputs.is_dictionary.data \
                     if inputs.is_dictionary.data else definition_filler.get_is_dictionary()
@@ -152,7 +154,7 @@ def update(definition_filler_id):
 @definition_fillers_module.route('/<int:definition_filler_id>', methods=['DELETE'])
 def delete(definition_filler_id):
     # Get the definition_filler
-    definition_filler = DefinitionFiller.get(definition_filler_id)
+    definition_filler = DefinitionFillersService.get_instance().get(definition_filler_id)
 
     # Verify the definition_filler creation inputs
     if definition_filler:

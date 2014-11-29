@@ -112,10 +112,6 @@ class Player(Base):
         }
         return dict(base_properties.items() + player_properties.items())
 
-    @classmethod
-    def get_from_auth(cls, auth_token):
-        return cls.query.filter_by(_auth_token=auth_token).first()
-
     @staticmethod
     def generate_auth_token():
         return uuid.uuid4()

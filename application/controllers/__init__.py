@@ -4,6 +4,7 @@ from functools import wraps
 from werkzeug.datastructures import MultiDict, ImmutableMultiDict, CombinedMultiDict
 
 from application.models.Player import Player
+from application.services.PlayersService import PlayersService
 from application import app
 
 
@@ -115,7 +116,7 @@ def index():
 def before_request():
     params = get_inputs()
     if params.get('auth_token'):
-        player = Player.get_from_auth(params.get('auth_token'))
+        player = PlayersService.get_instance().get_from_auth(params.get('auth_token'))
         if player:
             set_current_user(player)
             set_user_logged_in(True)

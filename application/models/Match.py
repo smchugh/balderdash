@@ -1,6 +1,5 @@
 from application import db
 from application.models.Base import Base
-from application.models.Game import Game
 
 # Define the many-to-many join table for the players assigned to a particular match
 match_players = db.Table(
@@ -147,49 +146,3 @@ class Match(Base):
         # turn info (from turn endpoint or match ?)
 
         return dict(base_properties.items() + match_properties.items())
-
-    @classmethod
-    def get_list_by_game_for_player(cls, game_id, player_id, limit, offset):
-        return cls.get_list_query(limit, offset).join(
-            match_players
-        ).filter(
-            match_players.c.player_id == player_id,
-            cls._game_id == game_id
-        ).all()
-
-    @classmethod
-    def get_opponent_match(cls, game_id, player, opponent_id):
-        # TODO return only the matches for this game with null start and cancel dates as a subquery before joining
-
-        return cls.query.join(
-            match_players
-        ).filter(
-            cls._game_id == game_id,
-            cls._date_started == None,
-            cls._date_canceled == None,
-            match_players.c.player_id == opponent_id,
-            # TODO replace with sqlalchemy subquery
-            '{} NOT IN (SELECT player_id FROM match_players WHERE match_players.match_id = matches._id)'.format(
-                player.get_id()
-            )
-        ).order_by(
-            cls._date_created.asc()
-        ).with_for_update().first()
-
-    @classmethod
-    def get_random_match(cls, game_id, player):
-        return cls.query.join(
-            match_players, Game
-        ).filter(
-            cls._game_id == game_id,
-            cls._date_started == None,
-            cls._date_canceled == None,
-            # TODO replace with sqlalchemy subquery
-            '{} NOT IN (SELECT player_id FROM match_players WHERE match_players.match_id = matches._id)'.format(
-                player.get_id()
-            ),
-            # TODO replace with sqlalchemy subquery
-            'games._match_size > (SELECT COUNT(*) FROM match_players WHERE match_players.match_id = matches._id)'
-        ).order_by(
-            cls._date_created.asc()
-        ).with_for_update().first()

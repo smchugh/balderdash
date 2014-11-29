@@ -77,16 +77,10 @@ class DefinitionTemplate(Base):
     @property
     def serialized(self):
         base_properties = super(DefinitionTemplate, self).serialized
-        game_properties = {
+        definition_template_properties = {
             'word': self.get_word().serialized,
             'definition': self.get_definition(),
             'filler_lexical_classes': self.get_filler_lexical_classes(),
             'is_active': self.get_is_active()
         }
-        return dict(base_properties.items() + game_properties.items())
-
-    @classmethod
-    def get_list_by_word(cls, word_id, limit, offset):
-        return cls.get_list_query(limit, offset).filter(
-            cls._word_id == word_id
-        ).all()
+        return dict(base_properties.items() + definition_template_properties.items())

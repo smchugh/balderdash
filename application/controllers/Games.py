@@ -7,6 +7,9 @@ from application.inputs.Games import ListInputs, CreateInputs, UpdateInputs
 # Import models
 from application.models.Game import Game
 
+# Import services
+from application.services.GamesService import GamesService
+
 # Import view rendering
 from application.controllers import get_inputs, render_view, get_mixed_dict_from_multidict
 
@@ -26,7 +29,7 @@ def index():
     # Verify the list inputs
     if inputs.validate():
 
-        games = Game.get_list(inputs.limit.data, inputs.offset.data)
+        games = GamesService.get_instance().get_list(inputs.limit.data, inputs.offset.data)
 
         return render_view('games/index', 200, games={game.get_id(): game.serialized for game in games})
 
@@ -56,7 +59,7 @@ def create():
 @games_module.route('/<int:game_id>', methods=['GET'])
 def show(game_id):
     # Get the game
-    game = Game.get(game_id)
+    game = GamesService.get_instance().get(game_id)
 
     if game:
         return render_view('games/show', 200, game=game.serialized)
@@ -68,7 +71,7 @@ def show(game_id):
 @games_module.route('/<int:game_id>', methods=['PUT'])
 def update(game_id):
     # Get the game
-    game = Game.get(game_id)
+    game = GamesService.get_instance().get(game_id)
 
     # Verify the game creation inputs
     if game:
@@ -94,7 +97,7 @@ def update(game_id):
 @games_module.route('/<int:game_id>', methods=['DELETE'])
 def delete(game_id):
     # Get the game
-    game = Game.get(game_id)
+    game = GamesService.get_instance().get(game_id)
 
     # Verify the game creation inputs
     if game:

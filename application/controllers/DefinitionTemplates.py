@@ -5,8 +5,11 @@ from flask import Blueprint
 from application.inputs.DefinitionTemplates import ListInputs, CreateInputs, UpdateInputs
 
 # Import models
-from application.models.Word import Word
 from application.models.DefinitionTemplate import DefinitionTemplate
+
+# Import services
+from application.services.WordsService import WordsService
+from application.services.DefinitionTemplatesService import DefinitionTemplatesService
 
 # Import view rendering
 from application.controllers import get_inputs, render_view, get_mixed_dict_from_multidict
@@ -29,11 +32,13 @@ def index():
     if inputs.validate():
 
         if inputs.word_id.data:
-            definition_templates = DefinitionTemplate.get_list_by_word(
+            definition_templates = DefinitionTemplatesService.get_instance().get_list_by_word(
                 inputs.word_id.data, inputs.limit.data, inputs.offset.data
             )
         else:
-            definition_templates = DefinitionTemplate.get_list(inputs.limit.data, inputs.offset.data)
+            definition_templates = DefinitionTemplatesService.get_instance().get_list(
+                inputs.limit.data, inputs.offset.data
+            )
 
         return render_view(
             'definition_templates/index',
@@ -56,7 +61,7 @@ def create():
     # Verify the definition_template creation inputs
     if inputs.validate_on_submit():
 
-        word = Word.get(inputs.word_id.data)
+        word = WordsService.get_instance().get(inputs.word_id.data)
         if word:
             definition_template = DefinitionTemplate(word, inputs.definition.data, inputs.filler_lexical_classes.data)
             try:
@@ -74,7 +79,7 @@ def create():
 @definition_templates_module.route('/<int:definition_template_id>', methods=['GET'])
 def show(definition_template_id):
     # Get the definition_template
-    definition_template = DefinitionTemplate.get(definition_template_id)
+    definition_template = DefinitionTemplatesService.get_instance().get(definition_template_id)
 
     if definition_template:
         return render_view('definition_templates/show', 200, definition_template=definition_template.serialized)
@@ -86,7 +91,7 @@ def show(definition_template_id):
 @definition_templates_module.route('/<int:definition_template_id>', methods=['PUT'])
 def update(definition_template_id):
     # Get the definition_template
-    definition_template = DefinitionTemplate.get(definition_template_id)
+    definition_template = DefinitionTemplatesService.get_instance().get(definition_template_id)
 
     # Verify the definition_template creation inputs
     if definition_template:
@@ -111,7 +116,8 @@ def update(definition_template_id):
             else:
                 definition_template.update(**{'is_active': False})
 
-                word = Word.get(inputs.word_id.data) if inputs.word_id.data else definition_template.get_word()
+                word = WordsService.get_instance().get(inputs.word_id.data) \
+                    if inputs.word_id.data else definition_template.get_word()
                 definition = inputs.definition.data if inputs.definition.data else definition_template.get_definition()
                 filler_lexical_classes = inputs.filler_lexical_classes.data \
                     if inputs.filler_lexical_classes.data else definition_template.get_filler_lexical_classes()
@@ -135,7 +141,7 @@ def update(definition_template_id):
 @definition_templates_module.route('/<int:definition_template_id>', methods=['DELETE'])
 def delete(definition_template_id):
     # Get the definition_template
-    definition_template = DefinitionTemplate.get(definition_template_id)
+    definition_template = DefinitionTemplatesService.get_instance().get(definition_template_id)
 
     # Verify the definition_template creation inputs
     if definition_template:

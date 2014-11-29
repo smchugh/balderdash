@@ -1,5 +1,3 @@
-import json
-
 from application import db
 from application.models.Base import Base
 from application.models.DefinitionTemplate import DefinitionTemplate
@@ -72,26 +70,10 @@ class DefinitionFiller(Base):
     @property
     def serialized(self):
         base_properties = super(DefinitionFiller, self).serialized
-        game_properties = {
+        definition_filler_properties = {
             'definition_template': self.get_definition_template().serialized,
             'filler': self.get_filler(),
             'is_dictionary': self.get_is_dictionary(),
             'is_active': self.get_is_active()
         }
-        return dict(base_properties.items() + game_properties.items())
-
-    @classmethod
-    def get_list_by_word(cls, word_id, limit, offset):
-        return cls.get_list_query(limit, offset).join(
-            DefinitionTemplate
-        ).filter(
-            DefinitionTemplate._word_id == word_id
-        ).all()
-
-    @classmethod
-    def get_list_by_definition_template(cls, definition_template_id, limit, offset):
-        return cls.get_list_query(limit, offset).join(
-            DefinitionTemplate
-        ).filter(
-            DefinitionTemplate._id == definition_template_id
-        ).all()
+        return dict(base_properties.items() + definition_filler_properties.items())

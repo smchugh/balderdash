@@ -14,18 +14,6 @@ class Base(db.Model):
         db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp()
     )
 
-    @classmethod
-    def get(cls, record_id):
-        return cls.query.filter_by(_id=record_id).first()
-
-    @classmethod
-    def get_list(cls, limit, offset):
-        return cls.get_list_query(limit, offset).all()
-
-    @classmethod
-    def get_list_query(cls, limit, offset):
-        return cls.query.order_by(cls._id).limit(limit).offset(offset)
-
     def get_id(self):
         return self._id
 

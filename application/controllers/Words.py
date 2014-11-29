@@ -7,6 +7,9 @@ from application.inputs.Words import ListInputs, CreateInputs, UpdateInputs
 # Import models
 from application.models.Word import Word
 
+# Import services
+from application.services.WordsService import WordsService
+
 # Import view rendering
 from application.controllers import get_inputs, render_view, get_mixed_dict_from_multidict
 
@@ -26,7 +29,7 @@ def index():
     # Verify the list inputs
     if inputs.validate():
 
-        words = Word.get_list(inputs.limit.data, inputs.offset.data)
+        words = WordsService.get_instance().get_list(inputs.limit.data, inputs.offset.data)
 
         return render_view('words/index', 200, words={word.get_id(): word.serialized for word in words})
 
@@ -56,7 +59,7 @@ def create():
 @words_module.route('/<int:word_id>', methods=['GET'])
 def show(word_id):
     # Get the word
-    word = Word.get(word_id)
+    word = WordsService.get_instance().get(word_id)
 
     if word:
         return render_view('words/show', 200, word=word.serialized)
@@ -68,7 +71,7 @@ def show(word_id):
 @words_module.route('/<int:word_id>', methods=['PUT'])
 def update(word_id):
     # Get the word
-    word = Word.get(word_id)
+    word = WordsService.get_instance().get(word_id)
 
     # Verify the word creation inputs
     if word:
@@ -111,7 +114,7 @@ def update(word_id):
 @words_module.route('/<int:word_id>', methods=['DELETE'])
 def delete(word_id):
     # Get the word
-    word = Word.get(word_id)
+    word = WordsService.get_instance().get(word_id)
 
     # Verify the word creation inputs
     if word:
