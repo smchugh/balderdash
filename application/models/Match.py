@@ -41,9 +41,6 @@ class Match(Base):
         self._set_game(game)
         self.add_player(player)
 
-    def __repr__(self):
-        return '<Match %r>' % self.get_id()
-
     def get_game(self):
         if self._game is None:
             raise AttributeError(
@@ -104,6 +101,7 @@ class Match(Base):
     def set_is_hidden(self, is_hidden):
         self._is_hidden = is_hidden
 
+    # TODO move state change logic in to service
     def start(self):
         self._set_date_started(db.func.current_timestamp())
         self._set_state(self.STATE_STARTED[0])

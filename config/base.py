@@ -1,11 +1,8 @@
-import os
+from config import env_bool
 
 # Statement for enabling the development environment
 DEBUG = True
-PRINT_SQL = os.environ.get('PRINT_SQL', False) in [True, 'True', '1', 'y', 'yes']
-
-# Define the application directory
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))  
+PRINT_SQL = env_bool('PRINT_SQL', False)
 
 # Define the database - we are working with
 SQLALCHEMY_DATABASE_URI = 'mysql://root@localhost/balderdash'
@@ -31,12 +28,3 @@ SECRET_KEY = "16da308e5a1c605eb9878939293808bc"
 # Application run-time configs
 PORT = 8080
 HOST = '0.0.0.0'
-
-# Environment specific config overrides
-APPLICATION_ENV = os.environ.get('APPLICATION_ENV', 'dev')
-if APPLICATION_ENV == 'dev':
-    PORT = 8181
-elif APPLICATION_ENV == 'staging':
-    pass
-elif APPLICATION_ENV == 'production':
-    pass

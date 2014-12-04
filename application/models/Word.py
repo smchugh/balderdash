@@ -22,9 +22,6 @@ class Word(Base):
         self._set_lexeme_form(lexeme_form)
         self._set_lexical_class(lexical_class)
 
-    def __repr__(self):
-        return '<Word %r>' % self.get_id()
-
     def get_lexeme_form(self):
         return self._lexeme_form
 

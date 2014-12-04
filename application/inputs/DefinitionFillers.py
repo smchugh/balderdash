@@ -1,5 +1,5 @@
 # Import input types such as TextField
-from wtforms import StringField, IntegerField, BooleanField, SelectMultipleField
+from wtforms import IntegerField, BooleanField, SelectMultipleField
 
 # Import input validators
 from wtforms.validators import InputRequired, NumberRange, Optional

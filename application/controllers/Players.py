@@ -22,14 +22,60 @@ players_module = Blueprint('players', __name__, url_prefix='/players')
 
 # Set some common error constants
 NOT_FOUND_ERROR = {'PlayerNotFound': ['Unable to find Player']}
-INVALID_USERNAME_PASSWORD_ERROR = {'InvalidInputs': ['Wrong username or password']}
+INVALID_USERNAME_PASSWORD_ERROR = {'InvalidUsernamePassword': ['Wrong username or password']}
 UNABLE_TO_SIGNIN_ERROR = {'SigninError': ['Unable to sign in an inactive player']}
 UNABLE_TO_SIGNOUT_ERROR = {'SignoutError': ['Unable to sign out player']}
 
 
 # Set the route and accepted methods
-@players_module.route('/', methods=['GET'])
+@players_module.route('', methods=['GET'])
 def index():
+    """
+    Request:
+    {
+        "offset": "offset",
+        "limit": "limit"
+    }
+
+    Response [422] (invalid parameters):
+    {
+        "errors": {
+            "name of parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+            "name of another parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+        },
+        "inputs": {
+            "offset": "value passed in. empty string if missing",
+            "limit": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [200] (success):
+    [
+        {
+            "id": "current value",
+            "date_created": "current value",
+            "date_modified": "current value",
+            "username": "current value",
+            "email": "current value",
+            "avatar_url": "current value",
+            "is_active": "current value"
+        },
+        {
+            "id": "current value",
+            "date_created": "current value",
+            "date_modified": "current value",
+            "username": "current value",
+            "email": "current value",
+            "avatar_url": "current value",
+            "is_active": "current value"
+        },
+        ...
+    ]
+    """
     # Get the input validator
     inputs = ListInputs(get_inputs())
 
@@ -44,8 +90,65 @@ def index():
 
 
 # Set the route and accepted methods
-@players_module.route('/', methods=['POST'])
+@players_module.route('', methods=['POST'])
 def create():
+    """
+    Request:
+    {
+        "username": "username",
+        "password": "password",
+        "confirm": "confirm",
+        "email": "email",
+        "avatar_url": "avatar_url"
+    }
+
+    Response [422] (invalid parameters):
+    {
+        "errors": {
+            "name of parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+            "name of another parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+        },
+        "inputs": {
+            "username": "value passed in. empty string if missing",
+            "password": NULL,
+            "confirm": NULL,
+            "email": "value passed in. empty string if missing",
+            "avatar_url": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [422] (save failure - unable to set user as inactive):
+    {
+        "errors": {
+            "IntegrityError": [
+                "Reason saving to the db failed, such as username/email uniqueness"
+            ]
+        },
+        "inputs": {
+            "username": "value passed in. empty string if missing",
+            "password": NULL,
+            "confirm": NULL,
+            "email": "value passed in. empty string if missing",
+            "avatar_url": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [200] (success):
+    {
+        "id": "current value",
+        "date_created": "current value",
+        "date_modified": "current value",
+        "username": "current value",
+        "email": "current value",
+        "avatar_url": "current value",
+        "is_active": "current value",
+        "auth_token": "current value"
+    }
+    """
     # Get the input validator
     inputs = CreateInputs(get_inputs())
 
@@ -68,6 +171,44 @@ def create():
 @players_module.route('/<int:player_id>', methods=['GET'])
 @authenticate
 def show(player_id):
+    """
+    Request:
+    {
+        "auth_token": "auth_token"
+    }
+
+    Response [422] (unauthenticated):
+    {
+        "errors": {
+            "UnauthorizedAccess": [
+                "Attempted to access data without an authenticated player"
+            ]
+        }
+    }
+
+    Response [422] (player with player_id doesn't exist):
+    {
+        "errors": {
+            "PlayerNotFound": [
+                "Unable to find Player"
+            ]
+        },
+        "inputs": {
+            "id": "player_id"
+        }
+    }
+
+    Response [200] (success):
+    {
+        "id": "current value",
+        "date_created": "current value",
+        "date_modified": "current value",
+        "username": "current value",
+        "email": "current value",
+        "avatar_url": "current value",
+        "is_active": "current value"
+    }
+    """
     # Get the player
     player = PlayersService.get_instance().get(player_id)
 
@@ -81,6 +222,86 @@ def show(player_id):
 @players_module.route('/<int:player_id>', methods=['PUT'])
 @authenticate
 def update(player_id):
+    """
+    Request:
+    {
+        "auth_token": "auth_token",
+        "username": "username",
+        "password": "password",
+        "email": "email",
+        "avatar_url": "avatar_url",
+        "is_active": "is_active"
+    }
+
+    Response [422] (unauthenticated):
+    {
+        "errors": {
+            "UnauthorizedAccess": [
+                "Attempted to access data without an authenticated player"
+            ]
+        }
+    }
+
+    Response [422] (player with player_id doesn't exist):
+    {
+        "errors": {
+            "PlayerNotFound": [
+                "Unable to find Player"
+            ]
+        },
+        "inputs": {
+            "id": "player_id"
+        }
+    }
+
+    Response [422] (invalid parameters):
+    {
+        "errors": {
+            "name of parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+            "name of another parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+        },
+        "inputs": {
+            "id": "player_id",
+            "username": "value passed in. empty string if missing",
+            "password": NULL,
+            "email": "value passed in. empty string if missing",
+            "avatar_url": "value passed in. empty string if missing",
+            "is_active": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [422] (save failure - unable to set user as inactive):
+    {
+        "errors": {
+            "IntegrityError": [
+                "Reason saving to the db failed"
+            ]
+        },
+        "inputs": {
+            "id": "player_id",
+            "username": "value passed in. empty string if missing",
+            "password": NULL,
+            "email": "value passed in. empty string if missing",
+            "avatar_url": "value passed in. empty string if missing",
+            "is_active": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [200] (success):
+    {
+        "id": "current value",
+        "date_created": "current value",
+        "date_modified": "current value",
+        "username": "current value",
+        "email": "current value",
+        "avatar_url": "current value",
+        "is_active": "current value"
+    }
+    """
     # Get the player
     player = PlayersService.get_instance().get(player_id)
 
@@ -108,6 +329,56 @@ def update(player_id):
 @players_module.route('/<int:player_id>', methods=['DELETE'])
 @authenticate
 def delete(player_id):
+    """
+    Request:
+    {
+        "auth_token": "auth_token"
+    }
+
+    Response [422] (unauthenticated):
+    {
+        "errors": {
+            "UnauthorizedAccess": [
+                "Attempted to access data without an authenticated player"
+            ]
+        }
+    }
+
+    Response [422] (player with player_id doesn't exist):
+    {
+        "errors": {
+            "PlayerNotFound": [
+                "Unable to find Player"
+            ]
+        },
+        "inputs": {
+            "id": "player_id"
+        }
+    }
+
+    Response [422] (save failure - unable to set user as inactive):
+    {
+        "errors": {
+            "IntegrityError": [
+                "Reason saving to the db failed"
+            ]
+        },
+        "inputs": {
+            "id": "player_id"
+        }
+    }
+
+    Response [200] (success):
+    {
+        "id": "current value",
+        "date_created": "current value",
+        "date_modified": "current value",
+        "username": "current value",
+        "email": "current value",
+        "avatar_url": "current value",
+        "is_active": "current value"
+    }
+    """
     # Get the player
     player = PlayersService.get_instance().get(player_id)
 
@@ -123,8 +394,69 @@ def delete(player_id):
 
 
 # Set the route and accepted methods
-@players_module.route('/signin/', methods=['POST'])
+@players_module.route('/signin', methods=['POST'])
 def signin():
+    """
+    Request:
+    {
+        "username": "username",
+        "password": "password"
+    }
+
+    Response [422] (invalid parameters):
+    {
+        "errors": {
+            "name of parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+            "name of another parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+        },
+        "inputs": {
+            "username": "value passed in. empty string if missing",
+            "password": NULL
+        }
+    }
+
+    Response [422] (login failure - username doesn't return user or password is invalid):
+    {
+        "errors": {
+            "InvalidUsernamePassword": [
+                "Wrong username or password"
+            ]
+        },
+        "inputs": {
+            "username": "value passed in. empty string if missing",
+            "password": NULL
+        }
+    }
+
+    Response [422] (signin failure - inactive user or save error):
+    {
+        "errors": {
+            "SigninError": [
+                "Unable to sign in an inactive player"
+            ]
+        },
+        "inputs": {
+            "username": "value passed in. empty string if missing",
+            "password": NULL
+        }
+    }
+
+    Response [200] (success):
+    {
+        "id": "current value",
+        "date_created": "current value",
+        "date_modified": "current value",
+        "username": "current value",
+        "email": "current value",
+        "avatar_url": "current value",
+        "is_active": "current value",
+        "auth_token": "current value"
+    }
+    """
     # Get the input validator
     inputs = SignInInputs(get_inputs())
 
@@ -147,9 +479,38 @@ def signin():
 
 
 # Set the route and accepted methods
-@players_module.route('/signout/', methods=['POST'])
+@players_module.route('/signout', methods=['POST'])
 @authenticate
 def signout():
+    """
+    Request:
+    {
+        "auth_token": "auth_token"
+    }
+
+    Response [422] (unauthenticated):
+    {
+        "errors": {
+            "UnauthorizedAccess": [
+                "Attempted to access data without an authenticated player"
+            ]
+        }
+    }
+
+    Response [422] (signout failure - save error):
+    {
+        "errors": {
+            "SignoutError": [
+                "Unable to sign out player"
+            ]
+        }
+    }
+
+    Response [200] (success):
+    {
+        "Success": "Player signed out"
+    }
+    """
     if get_current_user() and get_current_user().logout():
         return render_view('players/show', 200, player={'Success': 'Player signed out'})
     else:

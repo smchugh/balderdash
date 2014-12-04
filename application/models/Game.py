@@ -22,9 +22,6 @@ class Game(Base):
         self.set_description(description)
         self._set_match_size(match_size)
 
-    def __repr__(self):
-        return '<Game %r>' % self.get_id()
-
     def get_name(self):
         return self._name
 

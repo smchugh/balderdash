@@ -14,6 +14,9 @@ class Base(db.Model):
         db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp()
     )
 
+    def __repr__(self):
+        return '<{} {}>'.format(self.__class__.__name__, self.get_id())
+
     def get_id(self):
         return self._id
 

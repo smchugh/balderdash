@@ -22,9 +22,6 @@ class DefinitionTemplate(Base):
         self._set_definition(definition)
         self._set_filler_lexical_classes(filler_lexical_classes)
 
-    def __repr__(self):
-        return '<DefinitionTemplate %r>' % self.get_id()
-
     def get_word(self):
         return self._word
 

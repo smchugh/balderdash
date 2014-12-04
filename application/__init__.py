@@ -6,11 +6,15 @@ from flask import Flask
 # Import SQLAlchemy
 from flask.ext.sqlalchemy import SQLAlchemy
 
+# Import configurations
+from config import env_config
+
 # Define the WSGI application object
 app = Flask(__name__)
 
 # Configurations
-app.config.from_object('config')
+app.config.from_object('config.base')
+app.config.from_object(env_config)
 
 # Define the database object which is imported by model and controllers
 db = SQLAlchemy(app)

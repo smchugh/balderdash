@@ -3,7 +3,6 @@ from functools import wraps
 
 from werkzeug.datastructures import MultiDict, ImmutableMultiDict, CombinedMultiDict
 
-from application.models.Player import Player
 from application.services.PlayersService import PlayersService
 from application import app
 
@@ -12,12 +11,12 @@ UNAUTHORIZED_ERROR = {'UnauthorizedAccess': ['Attempted to access data without a
 
 
 def is_json_input_valid():
-    return request.content_type == 'application/json' and request.method != 'GET'
+    return request.mimetype == 'application/json' and request.method != 'GET'
 
 
 def get_inputs():
     if is_json_input_valid():
-        return MultiDict(dict(request.get_json(force=True).items() + request.values.items()))
+        return MultiDict(dict(request.get_json().items() + request.values.items()))
     else:
         return request.values
 

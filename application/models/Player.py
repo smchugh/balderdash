@@ -32,9 +32,6 @@ class Player(Base):
         self.set_avatar_url(avatar_url)
         self._set_auth_token(self.generate_auth_token())
 
-    def __repr__(self):
-        return '<Player %r>' % self.get_id()
-
     def get_username(self):
         return self._username
 
@@ -99,6 +96,8 @@ class Player(Base):
         except Exception as e:
             app.logger.error('Failed to remove auth token with error: {}'.format(e.message))
             return False
+
+        return True
 
     # Define serialized form of the model
     @property

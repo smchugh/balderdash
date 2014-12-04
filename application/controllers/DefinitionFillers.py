@@ -25,7 +25,7 @@ DEFINITION_TEMPLATE_NOT_FOUND_ERROR = {
 
 
 # Set the route and accepted methods
-@definition_fillers_module.route('/', methods=['GET'])
+@definition_fillers_module.route('', methods=['GET'])
 def index():
     # Get the input validator
     inputs = ListInputs(get_inputs())
@@ -57,7 +57,7 @@ def index():
 
 
 # Set the route and accepted methods
-@definition_fillers_module.route('/', methods=['POST'])
+@definition_fillers_module.route('', methods=['POST'])
 def create():
     # Get the input validator
     inputs = CreateInputs(get_inputs())

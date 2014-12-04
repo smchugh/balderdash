@@ -21,7 +21,7 @@ NOT_FOUND_ERROR = {'GameNotFound': ['Unable to find Game']}
 
 
 # Set the route and accepted methods
-@games_module.route('/', methods=['GET'])
+@games_module.route('', methods=['GET'])
 def index():
     # Get the input validator
     inputs = ListInputs(get_inputs())
@@ -37,7 +37,7 @@ def index():
 
 
 # Set the route and accepted methods
-@games_module.route('/', methods=['POST'])
+@games_module.route('', methods=['POST'])
 def create():
     # Get the input validator
     inputs = CreateInputs(get_inputs())

@@ -5,7 +5,7 @@ from application.models.DefinitionTemplate import DefinitionTemplate
 
 class DefinitionFiller(Base):
 
-    __tablename__ = 'definition_filler'
+    __tablename__ = 'definition_fillers'
 
     PROTECTED_ATTRIBUTES = ['definition_template_id', 'definition_template', 'filler', 'is_dictionary']
 
@@ -18,9 +18,6 @@ class DefinitionFiller(Base):
         self._set_definition_template(definition_template)
         self._set_filler(filler)
         self._set_is_dictionary(is_dictionary)
-
-    def __repr__(self):
-        return '<DefinitionTemplate %r>' % self.get_id()
 
     def get_definition_template(self):
         return self._definition_template
@@ -65,6 +62,10 @@ class DefinitionFiller(Base):
     def set_is_active(self, is_active):
         self._is_active = is_active
         return self
+
+    def save(self):
+        # TODO Add check that only one filler is the dictionary definition
+        super(DefinitionFiller, self).save()
 
     # Define serialized form of the model
     @property

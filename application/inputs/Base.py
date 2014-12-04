@@ -9,6 +9,9 @@ class Base(Form):
         if inputs.get('password') is not None:
             inputs['password'] = None
 
+        if inputs.get('confirm') is not None:
+            inputs['confirm'] = None
+
         return inputs
 
     def serialized(self):

@@ -25,7 +25,7 @@ OPPONENT_NOT_FOUND_ERROR = {'OpponentNotFound': ['Unable to find specified Oppon
 
 
 # Set the route and accepted methods
-@matches_module.route('/', methods=['GET'])
+@matches_module.route('', methods=['GET'])
 @authenticate
 def index():
     # Get the input validator
@@ -43,7 +43,7 @@ def index():
 
 
 # Set the route and accepted methods
-@matches_module.route('/', methods=['POST'])
+@matches_module.route('', methods=['POST'])
 @authenticate
 def create():
     # Get the input validator
