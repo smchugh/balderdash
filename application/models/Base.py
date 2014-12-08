@@ -38,7 +38,7 @@ class Base(db.Model):
 
         if protected_attributes:
             raise AttributeError(
-                'update to {} is not supported with changes to {}'.format(
+                'Update to {} is not supported with changes to {}'.format(
                     self.__class__.__name__, ', '.join(protected_attributes)
                 )
             )

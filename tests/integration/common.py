@@ -3,6 +3,7 @@ import json
 from tests.TestCase import TestCase
 from application import app
 from application.models.Player import Player
+from application.models.Game import Game
 
 
 def get_incremental_username(increment):
@@ -17,8 +18,17 @@ def get_incremental_avatar_url(increment):
     return 'http://cdn.balderdash.com/avatars/{}.jpg'.format(get_incremental_username(increment))
 
 
+def get_incremental_game_name(increment):
+    return 'game_{}'.format(increment)
+
+
+def get_incremental_game_description(increment):
+    return 'description_{}'.format(increment)
+
+
 class NoAuthTest(TestCase):
     NUM_PLAYERS = 11
+    NUM_GAMES = 3  # Must be > 1
     PLAYER_PASSWORD = 'password'
 
     def setUp(self):
@@ -30,6 +40,10 @@ class NoAuthTest(TestCase):
     def insert_dummy_data(self):
         super(NoAuthTest, self).insert_dummy_data()
 
+        self.insert_dummy_players()
+        self.insert_dummy_games()
+
+    def insert_dummy_players(self):
         player = None
         for player_index in range(1, self.NUM_PLAYERS + 1):
             username = get_incremental_username(player_index)
@@ -39,6 +53,24 @@ class NoAuthTest(TestCase):
             player.save()
 
         self.player = player
+
+    def insert_dummy_games(self):
+        game = None
+        large_game = None
+        for game_index in range(1, self.NUM_GAMES + 1):
+            name = get_incremental_game_name(game_index)
+            description = get_incremental_game_description(game_index)
+            if game_index % 2 == 0:
+                match_size = 4
+                large_game = Game(name, description, match_size)
+                large_game.save()
+            else:
+                match_size = 2
+                game = Game(name, description, match_size)
+                game.save()
+
+        self.game = game
+        self.large_game = large_game
 
     def get_params(self, request_params=None):
         params = self.params

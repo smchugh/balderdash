@@ -121,7 +121,7 @@ def create():
         }
     }
 
-    Response [422] (save failure - unable to set user as inactive):
+    Response [422] (save failure):
     {
         "errors": {
             "IntegrityError": [
@@ -274,11 +274,11 @@ def update(player_id):
         }
     }
 
-    Response [422] (save failure - unable to set user as inactive):
+    Response [422] (save failure):
     {
         "errors": {
             "IntegrityError": [
-                "Reason saving to the db failed"
+                "Reason saving to the db failed, such as username/email uniqueness"
             ]
         },
         "inputs": {

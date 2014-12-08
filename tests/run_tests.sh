@@ -7,6 +7,7 @@ export PYTHONPATH="$current_path":$PYTHONPATH
 # Run all tests
 # TODO replace with loop through all files in integration/unit, skipping 'common'
 APPLICATION_ENV=testing python $current_path/tests/integration/Players.py
+APPLICATION_ENV=testing python $current_path/tests/integration/Games.py
 
 # Reset the python path
 export PYTHONPATH="$old_python_path"
