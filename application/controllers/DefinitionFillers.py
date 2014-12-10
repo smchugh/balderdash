@@ -27,6 +27,56 @@ DEFINITION_TEMPLATE_NOT_FOUND_ERROR = {
 # Set the route and accepted methods
 @definition_fillers_module.route('', methods=['GET'])
 def index():
+    """
+    Request:
+    {
+        "offset": "offset",
+        "limit": "limit",
+        "word_id": "word_id",
+        "definition_template_id": "definition_template_id"
+    }
+
+    Response [422] (invalid parameters):
+    {
+        "errors": {
+            "name of parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+            "name of another parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+        },
+        "inputs": {
+            "offset": "value passed in. empty string if missing",
+            "limit": "value passed in. empty string if missing",
+            "word_id": "value passed in. empty string if missing",
+            "definition_template_id": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [200] (success):
+    [
+        {
+            "id": "current value",
+            "date_created": "current value",
+            "date_modified": "current value",
+            "definition_template": "current value",
+            "filler": "current value",
+            "is_dictionary": "current value",
+            "is_active": "current value"
+        },
+        {
+            "id": "current value",
+            "date_created": "current value",
+            "date_modified": "current value",
+            "definition_template": "current value",
+            "filler": "current value",
+            "is_dictionary": "current value",
+            "is_active": "current value"
+        },
+        ...
+    ]
+    """
     # Get the input validator
     inputs = ListInputs(get_inputs())
 
@@ -59,6 +109,70 @@ def index():
 # Set the route and accepted methods
 @definition_fillers_module.route('', methods=['POST'])
 def create():
+    """
+    Request:
+    {
+        "definition_template_id": "definition_template_id",
+        "filler": "filler",
+        "is_dictionary": "is_dictionary"
+    }
+
+    Response [422] (invalid parameters):
+    {
+        "errors": {
+            "name of parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+            "name of another parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+        },
+        "inputs": {
+            "definition_template_id": "value passed in. empty string if missing",
+            "filler": "value passed in. empty string if missing",
+            "is_dictionary": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [422] (definition_template with definition_template_id doesn't exist):
+    {
+        "errors": {
+            "DefinitionTemplateNotFound": [
+                "Unable to find the specified DefinitionTemplate"
+            ]
+        },
+        "inputs": {
+            "definition_template_id": "value passed in. empty string if missing",
+            "filler": "value passed in. empty string if missing",
+            "is_dictionary": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [422] (save failure):
+    {
+        "errors": {
+            "IntegrityError": [
+                "Reason saving to the db failed"
+            ]
+        },
+        "inputs": {
+            "definition_template_id": "value passed in. empty string if missing",
+            "filler": "value passed in. empty string if missing",
+            "is_dictionary": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [200] (success):
+    {
+        "id": "current value",
+        "date_created": "current value",
+        "date_modified": "current value",
+        "definition_template": "current value",
+        "filler": "current value",
+        "is_dictionary": "current value",
+        "is_active": "current value"
+    }
+    """
     # Get the input validator
     inputs = CreateInputs(get_inputs())
 
@@ -86,6 +200,33 @@ def create():
 # Set the route and accepted methods
 @definition_fillers_module.route('/<int:definition_filler_id>', methods=['GET'])
 def show(definition_filler_id):
+    """
+    Request:
+    {}
+
+    Response [422] (definition_filler with definition_filler_id doesn't exist):
+    {
+        "errors": {
+            "DefinitionFillerNotFound": [
+                "Unable to find DefinitionFiller"
+            ]
+        },
+        "inputs": {
+            "id": "definition_filler_id"
+        }
+    }
+
+    Response [200] (success):
+    {
+        "id": "current value",
+        "date_created": "current value",
+        "date_modified": "current value",
+        "definition_template": "current value",
+        "filler": "current value",
+        "is_dictionary": "current value",
+        "is_active": "current value"
+    }
+    """
     # Get the definition_filler
     definition_filler = DefinitionFillersService.get_instance().get(definition_filler_id)
 
@@ -98,6 +239,73 @@ def show(definition_filler_id):
 # Set the route and accepted methods
 @definition_fillers_module.route('/<int:definition_filler_id>', methods=['PUT'])
 def update(definition_filler_id):
+    """
+    Request:
+    {
+        "definition_template_id": "definition_template_id",
+        "filler": "filler",
+        "is_dictionary": "is_dictionary"
+        "is_active": "is_active"
+    }
+
+    Response [422] (definition_filler with definition_filler_id doesn't exist):
+    {
+        "errors": {
+            "DefinitionFillerNotFound": [
+                "Unable to find DefinitionFiller"
+            ]
+        },
+        "inputs": {
+            "id": "definition_filler_id"
+        }
+    }
+
+    Response [422] (invalid parameters):
+    {
+        "errors": {
+            "name of parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+            "name of another parameter that failed validation": [
+                "Reason for validation failure"
+            ],
+        },
+        "inputs": {
+            "id": "definition_filler_id",
+            "definition_template_id": "value passed in. empty string if missing",
+            "filler": "value passed in. empty string if missing",
+            "is_dictionary": "value passed in. empty string if missing",
+            "is_active": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [422] (save failure):
+    {
+        "errors": {
+            "IntegrityError": [
+                "Reason saving to the db failed"
+            ]
+        },
+        "inputs": {
+            "id": "definition_filler_id",
+            "definition_template_id": "value passed in. empty string if missing",
+            "filler": "value passed in. empty string if missing",
+            "is_dictionary": "value passed in. empty string if missing",
+            "is_active": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [200] (success):
+    {
+        "id": "current value",
+        "date_created": "current value",
+        "date_modified": "current value",
+        "definition_template": "current value",
+        "filler": "current value",
+        "is_dictionary": "current value",
+        "is_active": "current value"
+    }
+    """
     # Get the definition_filler
     definition_filler = DefinitionFillersService.get_instance().get(definition_filler_id)
 
@@ -114,7 +322,8 @@ def update(definition_filler_id):
 
         if inputs.validate_on_submit():
             # If we're only marking the filler as active or inactive, pass through to the update
-            if inputs.is_active.data:
+            if inputs.is_active.data and \
+                    not any([inputs.definition_template_id.data, inputs.filler.data, inputs.is_dictionary.data]):
                 try:
                     definition_filler.update(**get_mixed_dict_from_multidict(get_inputs(), inputs))
                     return render_view(
@@ -134,16 +343,23 @@ def update(definition_filler_id):
                 filler = inputs.filler.data if inputs.filler.data else definition_filler.get_filler()
                 is_dictionary = inputs.is_dictionary.data \
                     if inputs.is_dictionary.data else definition_filler.get_is_dictionary()
-                
-                definition_filler = DefinitionFiller(definition_template, filler, is_dictionary)
+                is_active = inputs.is_active.data if inputs.is_active.data else definition_filler.get_is_active()
 
-                try:
-                    definition_filler.save()
-                    return render_view(
-                        'definition_fillers/show', 200, definition_filler=definition_filler.serialized
-                    )
-                except Exception as e:
-                    return render_view('422', 422, errors={e.__class__.__name__: [e.message]}, inputs=combined_inputs)
+                if definition_template:
+                    definition_filler = DefinitionFiller(definition_template, filler, is_dictionary)
+                    definition_filler.set_is_active(is_active)
+
+                    try:
+                        definition_filler.save()
+                        return render_view(
+                            'definition_fillers/show', 200, definition_filler=definition_filler.serialized
+                        )
+                    except Exception as e:
+                        return render_view(
+                            '422', 422, errors={e.__class__.__name__: [e.message]}, inputs=combined_inputs
+                        )
+
+                return render_view('422', 422, errors=DEFINITION_TEMPLATE_NOT_FOUND_ERROR, inputs=inputs.serialized())
 
         return render_view('422', 422, errors=inputs.errors, inputs=combined_inputs)
 
@@ -153,6 +369,45 @@ def update(definition_filler_id):
 # Set the route and accepted methods
 @definition_fillers_module.route('/<int:definition_filler_id>', methods=['DELETE'])
 def delete(definition_filler_id):
+    """
+    Request:
+    {}
+
+    Response [422] (definition_filler with definition_filler_id doesn't exist):
+    {
+        "errors": {
+            "DefinitionFillerNotFound": [
+                "Unable to find DefinitionFiller"
+            ]
+        },
+        "inputs": {
+            "id": "definition_filler_id"
+        }
+    }
+
+    Response [422] (save failure - unable to set definition_filler as inactive):
+    {
+        "errors": {
+            "IntegrityError": [
+                "Reason saving to the db failed"
+            ]
+        },
+        "inputs": {
+            "id": "definition_filler_id"
+        }
+    }
+
+    Response [200] (success):
+    {
+        "id": "current value",
+        "date_created": "current value",
+        "date_modified": "current value",
+        "definition_template": "current value",
+        "filler": "current value",
+        "is_dictionary": "current value",
+        "is_active": "current value"
+    }
+    """
     # Get the definition_filler
     definition_filler = DefinitionFillersService.get_instance().get(definition_filler_id)
 

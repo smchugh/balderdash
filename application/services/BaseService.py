@@ -11,11 +11,8 @@ class BaseService(object):
     def get(self, record_id):
         return self.get_class().query.filter_by(_id=record_id).first()
 
-    def get_list(self, limit, offset):
-        return self.get_list_query(limit, offset).all()
-
-    def get_list_query(self, limit, offset):
-        return self.get_class().query.order_by(self.get_class()._id).limit(limit).offset(offset)
+    def get_list(self, limit=None, offset=None):
+        return self.get_class().query.order_by(self.get_class()._id).limit(limit).offset(offset).all()
 
     @classmethod
     def get_instance(cls):

@@ -23,6 +23,7 @@ class NoAuthPlayersIndex(NoAuthTest):
         response = self.get(index_url, query_string=query_string)
         self.assertEqual(200, response.status_code)
         players = json.loads(response.data)
+        self.assertTrue(len(players) > 0)
         self.assertEqual(limit, len(players))
 
     def test_index_returns_offset_players(self):

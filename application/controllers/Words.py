@@ -82,7 +82,8 @@ def update(word_id):
 
         if inputs.validate_on_submit():
             # If we're only marking the word as active or inactive, pass through to the update
-            if inputs.is_active.data:
+            if inputs.is_active.data and \
+                    not any([inputs.lexeme_form.data, inputs.lexical_class.data]):
                 try:
                     word.update(**get_mixed_dict_from_multidict(get_inputs(), inputs))
                     return render_view('words/show', 200, word=word.serialized)
@@ -94,8 +95,10 @@ def update(word_id):
 
                 lexeme_form = inputs.lexeme_form.data if inputs.lexeme_form.data else word.get_lexeme_form()
                 lexical_class = inputs.lexical_class.data if inputs.lexical_class.data else word.get_lexical_class()
+                is_active = inputs.is_active.data if inputs.is_active.data else word.get_is_active()
 
                 word = Word(lexeme_form, lexical_class)
+                word.set_is_active(is_active)
 
                 try:
                     word.save()

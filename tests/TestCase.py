@@ -80,6 +80,9 @@ WORDS = [
 
 
 class TestCase(unittest.TestCase):
+    NUM_WORDS = 0
+    NUM_DEFINITION_TEMPLATES = 0
+    NUM_DEFINITION_FILLERS = 0
 
     def run(self, result=None):
         # Abort the test suite on the first failure
@@ -103,13 +106,26 @@ class TestCase(unittest.TestCase):
         db.drop_all()
 
     def insert_dummy_data(self):
+        word = None
+        definition_template = None
+        definition_filler = None
         for word_data in WORDS:
             word = Word(word_data.get('lexeme_form'), word_data.get('lexical_class'))
             word.save()
+            self.NUM_WORDS += 1
             for template_data in word_data.get('definition_templates', []):
-                template = DefinitionTemplate(
+                definition_template = DefinitionTemplate(
                     word, template_data.get('definition'), template_data.get('filler_lexical_classes')
                 )
-                template.save()
+                definition_template.save()
+                self.NUM_DEFINITION_TEMPLATES += 1
                 for filler_data in template_data.get('definition_fillers', []):
-                    DefinitionFiller(template, filler_data.get('filler'), filler_data.get('is_dictionary')).save()
+                    definition_filler = DefinitionFiller(
+                        definition_template, filler_data.get('filler'), filler_data.get('is_dictionary')
+                    )
+                    definition_filler.save()
+                    self.NUM_DEFINITION_FILLERS += 1
+
+        self.word = word
+        self.definition_template = definition_template
+        self.definition_filler = definition_filler

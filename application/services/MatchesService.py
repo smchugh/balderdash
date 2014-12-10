@@ -8,12 +8,12 @@ class MatchesService(BaseService):
         super(MatchesService, self).__init__(Match)
 
     def get_list_by_game_for_player(self, game_id, player_id, limit, offset):
-        return self.get_list_query(limit, offset).join(
+        return self.get_class().query.join(
             match_players
         ).filter(
             match_players.c.player_id == player_id,
             self.get_class()._game_id == game_id
-        ).all()
+        ).order_by(self.get_class()._id).limit(limit).offset(offset).all()
 
     def get_opponent_match(self, game_id, player, opponent_id):
         # TODO return only the matches for this game with null start and cancel dates as a subquery before joining

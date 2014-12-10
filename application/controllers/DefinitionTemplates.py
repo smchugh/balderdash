@@ -102,7 +102,8 @@ def update(definition_template_id):
 
         if inputs.validate_on_submit():
             # If we're only marking the definition as active or inactive, pass through to the update
-            if inputs.is_active.data:
+            if inputs.is_active.data and \
+                    not any([inputs.word_id.data, inputs.definition.data, inputs.filler_lexical_classes.data]):
                 try:
                     definition_template.update(**get_mixed_dict_from_multidict(get_inputs(), inputs))
                     return render_view(
@@ -121,16 +122,23 @@ def update(definition_template_id):
                 definition = inputs.definition.data if inputs.definition.data else definition_template.get_definition()
                 filler_lexical_classes = inputs.filler_lexical_classes.data \
                     if inputs.filler_lexical_classes.data else definition_template.get_filler_lexical_classes()
+                is_active = inputs.is_active.data if inputs.is_active.data else definition_template.get_is_active()
 
-                definition_template = DefinitionTemplate(word, definition, filler_lexical_classes)
+                if word:
+                    definition_template = DefinitionTemplate(word, definition, filler_lexical_classes)
+                    definition_template.set_is_active(is_active)
 
-                try:
-                    definition_template.save()
-                    return render_view(
-                        'definition_templates/show', 200, definition_template=definition_template.serialized
-                    )
-                except Exception as e:
-                    return render_view('422', 422, errors={e.__class__.__name__: [e.message]}, inputs=combined_inputs)
+                    try:
+                        definition_template.save()
+                        return render_view(
+                            'definition_templates/show', 200, definition_template=definition_template.serialized
+                        )
+                    except Exception as e:
+                        return render_view(
+                            '422', 422, errors={e.__class__.__name__: [e.message]}, inputs=combined_inputs
+                        )
+
+                return render_view('422', 422, errors=WORD_NOT_FOUND_ERROR, inputs=inputs.serialized())
 
         return render_view('422', 422, errors=inputs.errors, inputs=combined_inputs)
 

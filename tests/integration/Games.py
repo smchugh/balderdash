@@ -22,6 +22,7 @@ class GamesIndex(NoAuthTest):
         response = self.get(index_url, query_string=query_string)
         self.assertEqual(200, response.status_code)
         games = json.loads(response.data)
+        self.assertTrue(len(games) > 0)
         self.assertEqual(limit, len(games))
 
     def test_index_returns_offset_games(self):
