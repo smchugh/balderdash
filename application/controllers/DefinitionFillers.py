@@ -162,6 +162,20 @@ def create():
         }
     }
 
+    Response [422] (save failure - invalid filler array length):
+    {
+        "errors": {
+            "AttributeError": [
+                "There are {} filler but {} filler lexical classes. These values must be the same"
+            ]
+        },
+        "inputs": {
+            "definition_template_id": "value passed in. empty string if missing",
+            "filler": "value passed in. empty string if missing",
+            "is_dictionary": "value passed in. empty string if missing"
+        }
+    }
+
     Response [200] (success):
     {
         "id": "current value",
@@ -185,8 +199,8 @@ def create():
 
         definition_template = DefinitionTemplatesService.get_instance().get(inputs.definition_template_id.data)
         if definition_template:
-            definition_filler = DefinitionFiller(definition_template, inputs.filler.data, inputs.is_dictionary.data)
             try:
+                definition_filler = DefinitionFiller(definition_template, inputs.filler.data, inputs.is_dictionary.data)
                 definition_filler.save()
                 return render_view('definition_fillers/show', 201, definition_filler=definition_filler.serialized)
             except Exception as e:
@@ -244,7 +258,7 @@ def update(definition_filler_id):
     {
         "definition_template_id": "definition_template_id",
         "filler": "filler",
-        "is_dictionary": "is_dictionary"
+        "is_dictionary": "is_dictionary",
         "is_active": "is_active"
     }
 
@@ -269,6 +283,38 @@ def update(definition_filler_id):
             "name of another parameter that failed validation": [
                 "Reason for validation failure"
             ],
+        },
+        "inputs": {
+            "id": "definition_filler_id",
+            "definition_template_id": "value passed in. empty string if missing",
+            "filler": "value passed in. empty string if missing",
+            "is_dictionary": "value passed in. empty string if missing",
+            "is_active": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [422] (definition_template with definition_template_id doesn't exist):
+    {
+        "errors": {
+            "DefinitionTemplateNotFound": [
+                "Unable to find the specified DefinitionTemplate"
+            ]
+        },
+        "inputs": {
+            "id": "definition_filler_id",
+            "definition_template_id": "value passed in. empty string if missing",
+            "filler": "value passed in. empty string if missing",
+            "is_dictionary": "value passed in. empty string if missing",
+            "is_active": "value passed in. empty string if missing"
+        }
+    }
+
+    Response [422] (save failure - invalid filler array length):
+    {
+        "errors": {
+            "AttributeError": [
+                "There are {} filler but {} filler lexical classes. These values must be the same"
+            ]
         },
         "inputs": {
             "id": "definition_filler_id",
@@ -346,10 +392,9 @@ def update(definition_filler_id):
                 is_active = inputs.is_active.data if inputs.is_active.data else definition_filler.get_is_active()
 
                 if definition_template:
-                    definition_filler = DefinitionFiller(definition_template, filler, is_dictionary)
-                    definition_filler.set_is_active(is_active)
-
                     try:
+                        definition_filler = DefinitionFiller(definition_template, filler, is_dictionary)
+                        definition_filler.set_is_active(is_active)
                         definition_filler.save()
                         return render_view(
                             'definition_fillers/show', 200, definition_filler=definition_filler.serialized

@@ -351,6 +351,43 @@ class DefinitionFillersCreate(NoAuthTest):
         self.assertEqual(filler, errors.get('inputs').get('filler'))
         self.assertEqual(False, errors.get('inputs').get('is_dictionary'))
 
+    def test_create_returns_error_for_invalid_filler(self):
+        create_url = '/definition_fillers'
+        definition_template_id = self.definition_filler.get_definition_template().get_id()
+        filler = '123'
+        definition_filler_data = {
+            'definition_template_id': definition_template_id,
+            'filler': filler
+        }
+        response = self.post(create_url, data=definition_filler_data)
+        self.assertEqual(422, response.status_code)
+        errors = json.loads(response.data)
+        self.assertIsNotNone(errors.get('errors'))
+        self.assertIsNotNone(errors.get('errors').get('AttributeError'))
+        self.assertIsNotNone(errors.get('inputs'))
+        self.assertEqual(definition_template_id, errors.get('inputs').get('definition_template_id'))
+        self.assertEqual([filler], errors.get('inputs').get('filler'))
+        self.assertEqual(False, errors.get('inputs').get('is_dictionary'))
+
+    def test_create_returns_error_from_filler_with_too_many_entries(self):
+        create_url = '/definition_fillers'
+        definition_template_id = self.definition_filler.get_definition_template().get_id()
+        filler = self.definition_filler.get_filler()
+        filler.append('foo')
+        definition_filler_data = {
+            'definition_template_id': definition_template_id,
+            'filler': filler
+        }
+        response = self.post(create_url, data=definition_filler_data)
+        self.assertEqual(422, response.status_code)
+        errors = json.loads(response.data)
+        self.assertIsNotNone(errors.get('errors'))
+        self.assertIsNotNone(errors.get('errors').get('AttributeError'))
+        self.assertIsNotNone(errors.get('inputs'))
+        self.assertEqual(definition_template_id, errors.get('inputs').get('definition_template_id'))
+        self.assertEqual(filler, errors.get('inputs').get('filler'))
+        self.assertEqual(False, errors.get('inputs').get('is_dictionary'))
+
     def test_create_returns_created_status(self):
         create_url = '/definition_fillers'
         definition_template = self.definition_filler.get_definition_template()

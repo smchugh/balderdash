@@ -9,6 +9,7 @@ export PYTHONPATH="$current_path":$PYTHONPATH
 APPLICATION_ENV=testing python $current_path/tests/integration/Players.py
 APPLICATION_ENV=testing python $current_path/tests/integration/Games.py
 APPLICATION_ENV=testing python $current_path/tests/integration/DefinitionFillers.py
+APPLICATION_ENV=testing python $current_path/tests/integration/DefinitionTemplates.py
 
 # Reset the python path
 export PYTHONPATH="$old_python_path"
