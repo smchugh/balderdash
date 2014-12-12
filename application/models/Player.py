@@ -17,6 +17,7 @@ class Player(Base):
     PASSWORD_MAX_LENGTH = 192
     AUTH_TOKEN_LENGTH = 128
     AVATAR_URL_MAX_LENGTH = 256
+    FB_ID_MAX_LENGTH = 128
 
     _username = db.Column(db.String(USERNAME_MAX_LENGTH), nullable=False, unique=True)
     _email = db.Column(db.String(EMAIL_MAX_LENGTH), nullable=False, unique=True)
@@ -24,8 +25,9 @@ class Player(Base):
     _is_active = db.Column(db.Boolean, nullable=False, default=True)
     _auth_token = db.Column(db.String(AUTH_TOKEN_LENGTH))
     _avatar_url = db.Column(db.String(AVATAR_URL_MAX_LENGTH))
+    _facebook_id = db.Column(db.String(FB_ID_MAX_LENGTH))
 
-    def __init__(self, username, password, email, avatar_url):
+    def __init__(self, username, password, email, avatar_url, facebook_id):
         self.set_username(username)
         self.set_password(password)
         self.set_email(email)
@@ -74,6 +76,13 @@ class Player(Base):
         self._avatar_url = avatar_url
         return self
 
+    def get_facebook_id(self):
+        return self._facebook_id
+
+    def set_facebook_id(self, facebook_id):
+        self._facebook_id = facebook_id
+        return self
+
     def login(self):
         if not self.get_is_active():
             return False
@@ -107,7 +116,8 @@ class Player(Base):
             'username': self.get_username(),
             'email': self.get_email(),
             'avatar_url': self.get_avatar_url(),
-            'is_active': self.get_is_active()
+            'is_active': self.get_is_active(),
+            'facebook_id': self.get_facebook_id()
         }
         return dict(base_properties.items() + player_properties.items())
 
