@@ -10,6 +10,7 @@ APPLICATION_ENV=testing python $current_path/tests/integration/Players.py
 APPLICATION_ENV=testing python $current_path/tests/integration/Games.py
 APPLICATION_ENV=testing python $current_path/tests/integration/DefinitionFillers.py
 APPLICATION_ENV=testing python $current_path/tests/integration/DefinitionTemplates.py
+APPLICATION_ENV=testing python $current_path/tests/integration/Words.py
 
 # Reset the python path
 export PYTHONPATH="$old_python_path"

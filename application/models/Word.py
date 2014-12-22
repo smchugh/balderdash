@@ -13,7 +13,7 @@ class Word(Base):
 
     LEXICAL_CLASSES = ['noun', 'pronoun', 'adjective', 'verb', 'adverb', 'preposition', 'conjunction', 'interjection']
 
-    _lexeme_form = db.Column(db.String(LEXEME_FORM_MAX_LENGTH), nullable=False, unique=True)
+    _lexeme_form = db.Column(db.String(LEXEME_FORM_MAX_LENGTH), nullable=False)
     _lexical_class = db.Column(db.String(LEXICAL_CLASS_MAX_LENGTH), nullable=False)
     _definition_templates = db.relationship('DefinitionTemplate', backref='_word', lazy='dynamic')
     _is_active = db.Column(db.Boolean, nullable=False, default=True)
