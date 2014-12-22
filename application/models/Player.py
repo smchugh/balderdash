@@ -27,12 +27,13 @@ class Player(Base):
     _avatar_url = db.Column(db.String(AVATAR_URL_MAX_LENGTH))
     _facebook_id = db.Column(db.String(FB_ID_MAX_LENGTH))
 
-    def __init__(self, username, password, email, avatar_url, facebook_id):
+    def __init__(self, username, password, email, avatar_url, facebook_id=None):
         self.set_username(username)
         self.set_password(password)
         self.set_email(email)
         self.set_avatar_url(avatar_url)
         self._set_auth_token(self.generate_auth_token())
+        self.set_facebook_id(facebook_id)
 
     def get_username(self):
         return self._username
