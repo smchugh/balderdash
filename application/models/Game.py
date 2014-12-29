@@ -14,7 +14,11 @@ class Game(Base):
     _name = db.Column(db.String(NAME_MAX_LENGTH), nullable=False, unique=True)
     _description = db.Column(db.String(DESCRIPTION_MAX_LENGTH), nullable=False)
     _matches = db.relationship('Match', backref='_game', lazy='dynamic')
+    # Total number of players engaged in each round
     _match_size = db.Column(db.Integer, nullable=False, default=2)
+    # Total number of definition fillers presented to a player every turn
+    # definition_filler_count == len([dictionary_definition]) + match_size + len(auto_generated_definitions)
+    _definition_filler_count = db.Column(db.Integer, nullable=False, default=4)
     _is_active = db.Column(db.Boolean, nullable=False, default=True)
 
     def __init__(self, name, description, match_size):
