@@ -6,7 +6,7 @@ class Game(Base):
 
     __tablename__ = 'games'
 
-    PROTECTED_ATTRIBUTES = ['match_size', 'matches']
+    PROTECTED_ATTRIBUTES = ['match_size', 'matches', 'definition_filler_count']
 
     NAME_MAX_LENGTH = 128
     DESCRIPTION_MAX_LENGTH = 1024
@@ -21,10 +21,11 @@ class Game(Base):
     _definition_filler_count = db.Column(db.Integer, nullable=False, default=4)
     _is_active = db.Column(db.Boolean, nullable=False, default=True)
 
-    def __init__(self, name, description, match_size):
+    def __init__(self, name, description, match_size, definition_filler_count):
         self.set_name(name)
         self.set_description(description)
         self._set_match_size(match_size)
+        self._set_definition_filler_count(definition_filler_count)
 
     def get_name(self):
         return self._name
@@ -54,6 +55,13 @@ class Game(Base):
         self._match_size = match_size
         return self
 
+    def get_definition_filler_count(self):
+        return self._definition_filler_count
+
+    def _set_definition_filler_count(self, definition_filler_count):
+        self._definition_filler_count = definition_filler_count
+        return self
+
     # Define serialized form of the model
     @property
     def serialized(self):
@@ -62,6 +70,7 @@ class Game(Base):
             'name': self.get_name(),
             'description': self.get_description(),
             'match_size': self.get_match_size(),
+            'definition_filler_count': self.get_definition_filler_count(),
             'is_active': self.get_is_active()
         }
         return dict(base_properties.items() + game_properties.items())

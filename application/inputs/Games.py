@@ -52,7 +52,12 @@ class CreateInputs(Base):
 
     match_size = IntegerField(
         'Players per Match',
-        [Optional(), NumberRange(min=0)]
+        [Optional(), NumberRange(min=1)]
+    )
+
+    definition_filler_count = IntegerField(
+        'Definitions per Turn',
+        [Optional(), NumberRange(min=1)]
     )
 
 

@@ -55,6 +55,7 @@ def index():
             "name": "current value",
             "description": "current value",
             "match_size": "current value",
+            "definition_filler_count": "current value",
             "is_active": "current value"
         },
         {
@@ -64,6 +65,7 @@ def index():
             "name": "current value",
             "description": "current value",
             "match_size": "current value",
+            "definition_filler_count": "current value",
             "is_active": "current value"
         },
         ...
@@ -90,7 +92,8 @@ def create():
     {
         "name": "name",
         "description": "description",
-        "match_size": "match_size"
+        "match_size": "match_size",
+        "definition_filler_count": "definition_filler_count"
     }
 
     Response [422] (invalid parameters):
@@ -106,7 +109,8 @@ def create():
         "inputs": {
             "name": "value passed in. empty string if missing",
             "description": "value passed in. empty string if missing",
-            "match_size": "value passed in. empty string if missing"
+            "match_size": "value passed in. empty string if missing",
+            "definition_filler_count": "value passed in. empty string if missing"
         }
     }
 
@@ -120,7 +124,8 @@ def create():
         "inputs": {
             "name": "value passed in. empty string if missing",
             "description": "value passed in. empty string if missing",
-            "match_size": "value passed in. empty string if missing"
+            "match_size": "value passed in. empty string if missing",
+            "definition_filler_count": "value passed in. empty string if missing"
         }
     }
 
@@ -132,6 +137,7 @@ def create():
         "name": "current value",
         "description": "current value",
         "match_size": "current value",
+        "definition_filler_count": "current value",
         "is_active": "current value"
     }
     """
@@ -141,7 +147,9 @@ def create():
     # Verify the game creation inputs
     if inputs.validate_on_submit():
 
-        game = Game(inputs.name.data, inputs.description.data, inputs.match_size.data)
+        game = Game(
+            inputs.name.data, inputs.description.data, inputs.match_size.data, inputs.definition_filler_count.data
+        )
         try:
             game.save()
             return render_view('games/show', 201, game=game.serialized)
@@ -178,6 +186,7 @@ def show(game_id):
         "name": "current value",
         "description": "current value",
         "match_size": "current value",
+        "definition_filler_count": "current value",
         "is_active": "current value"
     }
     """
@@ -269,6 +278,7 @@ def update(game_id):
         "name": "current value",
         "description": "current value",
         "match_size": "current value",
+        "definition_filler_count": "current value",
         "is_active": "current value"
     }
     """
@@ -334,6 +344,7 @@ def delete(game_id):
         "name": "current value",
         "description": "current value",
         "match_size": "current value",
+        "definition_filler_count": "current value",
         "is_active": "current value"
     }
     """

@@ -57,3 +57,31 @@ Flask-MySQL==1.2
 # License: GPL
 # Upstream url: http://sourceforge.net/projects/mysql-python
 MySQL-python==1.2.5
+
+# Python development support library
+# License: MIT
+# Upstream url: https://bitbucket.org/hpk42/py/
+# Required by: pytest
+py==1.4.25
+
+# Simple powerful testing with Python
+# License: MIT
+# Upstream url: https://bitbucket.org/hpk42/pytest/
+pytest==2.6.3
+
+# Plugin core for use by pytest-cov, nose-cov and nose2-cov
+# License: MIT
+# Upstream url: https://github.com/schlamar/cov-core
+# Required by: pytest-cov
+cov-core==1.14.0
+
+# Code coverage measurement for Python
+# License: BSD
+# Upstream url: https://bitbucket.org/ned/coveragepy/
+# Required by: pytest-cov
+coverage==3.7.1
+
+# py.test plugin for coverage reporting
+# License: MIT
+# Upstream url: https://github.com/schlamar/pytest-cov
+pytest-cov==1.8.0

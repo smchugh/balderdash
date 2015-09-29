@@ -11,6 +11,9 @@ from application.models.Match import Match
 from application.services.GamesService import GamesService
 from application.services.PlayersService import PlayersService
 from application.services.MatchesService import MatchesService
+from application.services.TurnsService import TurnsService
+from application.services.TurnPlayersService import TurnPlayersService
+from application.services.TurnDefinitionFillersService import TurnDefinitionFillersService
 
 # Import view rendering
 from application.controllers import get_inputs, render_view, authenticate, get_current_user
@@ -22,6 +25,7 @@ matches_module = Blueprint('matches', __name__, url_prefix='/matches')
 NOT_FOUND_ERROR = {'MatchNotFound': ['Unable to find Match']}
 GAME_NOT_FOUND_ERROR = {'GameNotFound': ['Unable to find the specified Game']}
 OPPONENT_NOT_FOUND_ERROR = {'OpponentNotFound': ['Unable to find specified Opponent']}
+TURN_NOT_FOUND_ERROR = {'TurnNotFound': ['Unable to find an active turn for the specified match']}
 
 
 # Set the route and accepted methods
@@ -104,13 +108,26 @@ def create():
 @matches_module.route('/<int:match_id>', methods=['GET'])
 @authenticate
 def show(match_id):
-    # Get the match
-    match = MatchesService.get_instance().get(match_id)
+    # Get the current turn
+    turn, errors = TurnsService.get_instance().get_player_turn(match_id, get_current_user().get_id())
 
-    if match:
+    if not errors:
+        turn_player = TurnPlayersService.get_instance().get_for_turn_by_player(
+            turn.get_id(), get_current_user().get_id()
+        )
+
+        # Get the turn_definition_fillers for this turn
+        turn_definition_fillers = TurnDefinitionFillersService.get_instance().get_list_by_turn(turn.get_id())
+
+        # If this player is the selector for this turn
+        if turn_player.get_is_selector():
+            # TODO Test SQL for turn.get_match().get_game().get_definition_filler_count() vs turn.match.game.get_definition_filler_count()
+            if turn.get_match().get_game().get_definition_filler_count() > len(turn_definition_fillers):
+                pass
+
         return render_view('matches/show', 200, match=match.serialized)
 
-    return render_view('422', 422, errors=NOT_FOUND_ERROR, inputs={'id': match.get_id()})
+    return render_view('422', 422, errors=errors, inputs={'id': match_id})
 
 # Set the route and accepted methods
 @matches_module.route('/<int:match_id>', methods=['PUT'])
@@ -133,6 +150,7 @@ def update(match_id):
     ## If selector turn
 
     # If count of turn_definition_fillers < game.definition_filler_count
+    # TODO Test SQL for turn.get_match().get_game().get_definition_filler_count() vs turn.match.game.get_definition_filler_count()
     # :: return STATE_SUPPLYING state and an empty definitions array (end loop)
 
     # Elseif state == STATE_SUPPLYING || (state == STATE_SELECTING && there is not a turn_definition_filler with selector_id)

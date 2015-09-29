@@ -28,7 +28,7 @@ class Match(Base):
         'Player',
         secondary=match_players,
         backref=db.backref('_matches', lazy='dynamic'),
-        order_by=match_players.c.player_id
+        order_by=match_players.c.date_joined
     )
     _state = db.Column(db.SmallInteger, default=STATE_WAITING[0], nullable=False)
     _date_started = db.Column(db.DateTime)

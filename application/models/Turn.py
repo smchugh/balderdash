@@ -1,5 +1,6 @@
 from application import db
 from application.models.Base import Base
+from application.models.TurnPlayer import TurnPlayer
 
 
 class Turn(Base):
@@ -15,15 +16,15 @@ class Turn(Base):
     STATES = [STATE_SUPPLYING, STATE_SELECTING, STATE_CANCELED, STATE_COMPLETED]
 
     _match_id = db.Column(db.BigInteger, db.ForeignKey('matches._id'), nullable=False)
-    _players = db.relationship('TurnPlayer', backref='_turn', lazy='dynamic')
+    _players = db.relationship('TurnPlayer', backref='turn', lazy='dynamic')
     _word_id = db.Column(db.BigInteger, db.ForeignKey('words._id'), nullable=False)
     _state = db.Column(db.SmallInteger, default=STATE_SUPPLYING[0], nullable=False)
     _date_canceled = db.Column(db.DateTime)
     _date_completed = db.Column(db.DateTime)
 
-    def __init__(self, match, player, word):
+    def __init__(self, match, selector, word):
         self._set_match(match)
-        self._set_player(player)
+        self._set_players(selector)
         self._set_word(word)
 
     def get_match(self):
@@ -33,11 +34,14 @@ class Turn(Base):
         self._match = match
         return self
 
-    def get_player(self):
-        return self._player
+    def get_players(self):
+        return self._players
 
-    def _set_player(self, player):
-        self._player = player
+    def _set_players(self, selector):
+        players = self.get_match().get_players()
+        for player in players:
+            turn_player = TurnPlayer(self, player, player.get_id() == selector.get_id())
+            self._players.append(turn_player)
         return self
 
     def get_word(self):

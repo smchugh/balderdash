@@ -9,7 +9,7 @@ class TurnPlayer(Base):
     PROTECTED_ATTRIBUTES = ['turn_id', 'turn', 'player_id', 'player', 'is_selector']
 
     _turn_id = db.Column(db.BigInteger, db.ForeignKey('turns._id'), nullable=False)
-    _player_id = db.Column(db.BigInteger, db.ForeignKey('players._id'))
+    _player_id = db.Column(db.BigInteger, db.ForeignKey('players._id'), nullable=False)
     # True if this is the player selecting a definition filler this turn
     _is_selector = db.Column(db.Boolean, nullable=False, default=False)
     # This players score from this turn

@@ -1,6 +1,8 @@
 from application.models.Match import Match, match_players
 from application.models.Game import Game
 from application.services.BaseService import BaseService
+from application.services.TurnsService import TurnsService
+from application.services.PlayersService import PlayersService
 
 
 class MatchesService(BaseService):
@@ -49,3 +51,11 @@ class MatchesService(BaseService):
         ).order_by(
             self.get_class()._date_created.asc()
         ).with_for_update().first()
+
+    def get_for_player(self, match_id, player_id):
+        return self.get_class().query.join(
+            match_players
+        ).filter(
+            self.get_class()._id == match_id,
+            match_players.c.player_id == player_id
+        ).first()

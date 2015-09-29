@@ -1,0 +1,83 @@
+TODO: 11/12
+x- Replace jsonify with json views and logic for html views
+- Add game controller with html-only views and user protected
+- Replace Player with User and have player being a new model with user_id and administrator be a new model with user_id and role
+    - OR, Make Player and Administrator sub classes of User so the user data is denormalized and players/admins cannot be linked (no users table)
+- Add bootstrap with admin user and first game
+x- Add match controller
+- Add facebook auth (oauth might be good to replace flask-login)
+- Fix csrf protection (https://flask-wtf.readthedocs.org/en/latest/form.html)
+- Add unit/integration tests for end points (make sure it uses a test db)
+x- Replace sqlite3 with mysql
+- Move app keys to ENV params so they're set in heroku, not written in the code
+- add support for archive tables
+- move auth token out of db and in to session memory
+
+***
+- move classmethods in to services
+- create turn generation for match service
+- change add_player logic to match service logic that handles saves
+
+
+Data Model
+
+Word => {id, date_created, date_modified, word, word_type, active}
+DefinitionTemplate => {id, date_created, date_modified, word_id, definition, filler_lexical_classes, active}
+ - definition => "This is some definition with {noun} filler and {verb} stuff {noun}"
+ - filler_lexical_classes is a serialized array of the lexical class for each filler entry
+    [len(filler_lexical_classes) == num instances of "{}" in definition]
+ - an update to the definition template will actually mark the template as inactive and create a new one so that
+    fillers are disassociated and old turns point to unmodified definition template for historical preservation
+ - Can be 1 or more definition templates per word
+DefinitionFiller => {id, date_created, date_modified, definition_template_id, fillers, is_dictionary}
+ - fillers => Serialized array of filler text
+
+Match => {id, date_created, date_modified, game_id, *players*, date_started, date_completed}
+Turn => {id, date_created, date_modified, match_id, player_id, word_id}
+TurnDefinitionFiller => {id, date_created, date_modified, turn_id, definition_template_id, fillers, is_dictionary, supplied_by_player_id, selected_by_opponent_id}
+ - Send back fillers from user, instead of filled-in definition so that we can compare fillers with user supplied
+    fillers before sending them over to the next user so we don't send duplicate definitions
+ - This table will include the fillers randomly assigned to various definition_template_ids for the word assigned in
+    this turn (with player_supplied == 0) as well as the fillers provided by the player (with player_supplied == 1)
+ - It will also include which of the records for this turn was selected by the following player through opponent_selected being set to 1 from a PUT
+
+
+
+send out template to everyone except player,
+everyone makes a definition
+player guesses
+points to player:
+1 for dictionary
+0 for friend or rando
+points to opponent:
+2 for friend
+
+
+get on match will get current turn with the current state for that player within the turn
+
+
+
+
+Friends list
+- dummy players with only FB IDs and when a players comes in via email we update the join table to their new player_id
+
+Turns
+
+- turn states and player states to get the current players action
+- each turn has a map of player_id to score for the turn
+
+
+
+
+
+
+Match:SHOW
+
+
+Match:PUT
+
+
+
+
+
+
